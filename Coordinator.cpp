@@ -107,7 +107,7 @@ void Coordinator::addToBufferList(AgentBuffer ab) {
 }
 
 void Coordinator::debugListPrint() {
-	Serial.println("In debug: current BLP is " + String(bufferListPool.empty()) +
+	Serial.println("In debugListPrint: current BLP is " + String(bufferListPool.empty()) +
 		" listType size is " + String(this->bufferListPool.size()));
 
 	// for (int j = 0;j < this->bufferListPool.size();j++) {
@@ -123,7 +123,8 @@ void Coordinator::debugListPrint() {
 
 int Coordinator::indexOfListType(String bdType) {
 	for (int i = 0;i < this->bufferListPool.size();i++) {
-		Serial.println("debug: in indexOfListType: current is " + String(i) + " BLP size is " + String(this->bufferListPool.size()));
+		Serial.println("debug: in indexOfListType: current is " + String(i) +
+			" BLP size is " + String(this->bufferListPool.size()));
 		if (this->bufferListPool[i].getListType() == bdType)
 			return i;
 	}

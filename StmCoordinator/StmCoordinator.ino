@@ -97,7 +97,7 @@ void loop() {
     Serial.println("CMD: " + cmd);
     AgentMsg tempMsg = AgentProtocol::parseFromString(cmd);
     // printString(cmd);
-    if (tempMsg.boardId != "") {
+    if (tempMsg.boardId != "" && tempMsg.boardType != "") {
       Serial.println("received cmdType: " + tempMsg.cmdType);
       co.addToBufferList(AgentBuffer::msgToAgentBuffer(tempMsg, co.getInputBuffer()));
     }
