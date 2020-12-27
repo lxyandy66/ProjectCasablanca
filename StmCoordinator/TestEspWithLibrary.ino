@@ -27,11 +27,11 @@
 #include "DevBoardESP8266.h"
 #include"Agent.h"
 
-#define ESP_SSID  "I am AB, How R U?"//"TP-LINK_hvac" "BlackBerry Hotspot"
-#define ESP_PASS  "woyeshiab"         // Your network password here "141242343"
+#define ESP_SSID  "BlackBerry Hotspot"//"TP-LINK_hvac" "I am AB, How R U?"
+#define ESP_PASS     "141242343"     // Your network password here  "woyeshiab" 
 
-#define TCP_SERVER_ADDR "192.168.1.104" //TCP服务器地址
-#define TCP_SERVER_PORT 8266            //TCP服务器地址
+#define TCP_SERVER_ADDR "192.168.43.12" //TCP服务器地址
+#define TCP_SERVER_PORT 5230            //TCP服务器地址
 #define PIN_LED D2
 
 SoftwareSerial mySerial(10, 11); // RX, TX10, 11
@@ -50,7 +50,7 @@ void setup()
 
   // Open serial communications and wait for port to open:
   //USB串口测试
-  Serial.begin(115200);
+  Serial.begin(9600);
   while (!Serial)
   {
     ; // wait for serial port to connect. Needed for native USB port only
@@ -58,33 +58,33 @@ void setup()
 
   Serial.println("Goodnight moon!");
 
-  // agent.setWifiModule(wifi);
+  agent.setWifiModule(wifi);
 
   // set the data rate for the SoftwareSerial port
-  // mySerial.begin(115200);
-  // while (!mySerial)
-  // {
-  //   ;
-  // }
-  // Serial.println("SS initialized!");
-  // wifi.hardReset();
+  mySerial.begin(9600);
+  while (!mySerial)
+  {
+    ;
+  }
+  Serial.println("SS initialized!");
+  wifi.hardReset();
 
-  // //Wi-Fi连接测试
-  // Serial.println(F("Connecting to WiFi..."));
-  // boolean flag = wifi.connectToAP(F(ESP_SSID), F(ESP_PASS));
+  //Wi-Fi连接测试
+  Serial.println(F("Connecting to WiFi..."));
+  boolean flag = wifi.connectToAP(F(ESP_SSID), F(ESP_PASS));
 
-  // if (flag)
-  // {
-  //   Serial.println("Connecting Success");
-  // }
-  // else
-  // {
-  //   Serial.println("Connecting Failed");
-  // }
+  if (flag)
+  {
+    Serial.println("Connecting Success");
+  }
+  else
+  {
+    Serial.println("Connecting Failed");
+  }
 
-  // wifi.connectTCP(F(TCP_SERVER_ADDR), TCP_SERVER_PORT);
+  wifi.connectTCP(F(TCP_SERVER_ADDR), TCP_SERVER_PORT);
 
-  // Serial.println(F("Setup finished"));
+  Serial.println(F("Setup finished"));
   agent.setSendOutput(&Serial);
   agent.setLedPin(PIN_LED);
 }
@@ -95,17 +95,16 @@ void loop()
   while (Serial.available()) {
     String msg = Serial.readString();
     Serial.println("this is a msg: [" + msg + "]");
-    // Serial.write(mySerial.read().toCharArray());
-
+    mySerial.write(Serial.read());
     //加入buffer之后自动解析
-    agent.addToBuffer(CoordinatorBuffer::msgToCoordinatorBuffer(AgentProtocol::parseFromString(msg), agent.getInputBuffer()));
+    // agent.addToBuffer(CoordinatorBuffer::msgToCoordinatorBuffer(AgentProtocol::parseFromString(msg), agent.getInputBuffer()));
     // processCmd(a);
     return;
   }
-  // if (Serial.available())
-  // {
-  //   mySerial.write(Serial.read());
-  // }
+  if (mySerial.available())
+  {
+    Serial.write(mySerial.read());
+  }
 
 
 }
