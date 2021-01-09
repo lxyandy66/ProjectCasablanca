@@ -68,7 +68,7 @@ void Agent::addToBuffer(CoordinatorBuffer cb) {
 	this->coBuffer = cb;
 	this->reqId = cb.getReqId();
 	this->respId = 0;
-	this->parseBuffer(this->coBuffer);
+	// this->parseBuffer(this->coBuffer);
 }
 
 

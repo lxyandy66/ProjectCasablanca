@@ -29,10 +29,13 @@
 
 //#define ESP_SSID  "superb"//"TP-LINK_hvac" "BlackBerry Hotspot"
 //#define ESP_PASS  "bugaosuni"         // Your network password here "141242343"
-#define ESP_SSID  "BlackBerry Hotspot"//"TP-LINK_hvac" 
-#define ESP_PASS  "141242343"         // Your network password here "141242343"
+// #define ESP_SSID  "BlackBerry Hotspot"//"TP-LINK_hvac" 
+// #define ESP_PASS  "141242343"         // Your network password here "141242343"
 
-#define TCP_SERVER_ADDR "192.168.43.12" //TCP服务器地址
+#define ESP_SSID  "HMT-Freshmen"//"TP-LINK_hvac" 
+#define ESP_PASS  "stars15hmt"         // Your network password here "141242343"
+
+#define TCP_SERVER_ADDR "172.16.33.234" //TCP服务器地址
 #define TCP_SERVER_PORT 5230            //TCP服务器地址
 
 #define PIN_LED D2
@@ -89,7 +92,7 @@ void setup()
   wifi.connectTCP(F(TCP_SERVER_ADDR), TCP_SERVER_PORT);
 
   Serial.println(F("Setup finished"));
-  agent.setSendOutput(&Serial);
+  agent.setSendOutput(&mySerial);
   agent.setLedPin(PIN_LED);
 }
 
@@ -99,7 +102,7 @@ void loop()
   if (mySerial.available() > 0) {
 
     Serial.println("mySerial length: " + mySerial.available());
-    String msg = Serial.readString();
+    String msg = preprocessMsgFromWifiModule(mySerial.readString());
     Serial.println("this is a msg: [" + msg + "] length: " + msg.length());
     // Serial.write(mySerial.read().toCharArray());
 
@@ -111,7 +114,8 @@ void loop()
     }
 
     agent.addToBuffer(CoordinatorBuffer::msgToCoordinatorBuffer(msgBuffer, agent.getInputBuffer()));
-    // processCmd(a);
+    //发送的逻辑要考虑考虑
+    wifi.sendContent(agent.packAgentData());// processCmd(a);
     return;
   }
   if (Serial.available())
@@ -120,6 +124,11 @@ void loop()
   }
 
 
+}
+
+String preprocessMsgFromWifiModule(String orgMsg) {
+  //直接从wifi模块里面获取的信息带头尾, 例如"+IPD,93:{"id":"Co_1","tp":...}"
+  return orgMsg.substring(orgMsg.indexOf(":") + 1);
 }
 
 void getIpAddress()
