@@ -36,7 +36,7 @@ private:
 	String listType;//用于表明该list对应的是什么类型的设备
 
 public:
-	AgentBufferList(String listType);
+	AgentBufferList(String lt);
 
 	String getListType();
 	void setListType(String str);

@@ -25,6 +25,7 @@
  * MIT license, all text above must be included in any redistribution.
  */
 
+#pragma once
 #include "DevBoardESP8266.h"
 
 /**************************************************************************/

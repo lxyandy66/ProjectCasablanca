@@ -1,0 +1,141 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{C5F80730-F44F-4478-BDAE-6634EFC2CA88}</ProjectGuid>
+    <RootNamespace>Project_Casablanca</RootNamespace>
+    <ProjectName>Project Casablanca</ProjectName>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>
+    </PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>
+    </PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>
+    </PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>
+    </PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v141</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup />
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <SDLCheck>true</SDLCheck>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\StmCoordinator;$(ProjectDir)..\..\..\..\Documents\Arduino\libraries\Protothreads\src;$(ProjectDir)..\..\..\..\Documents\Arduino\libraries\Chrono;$(ProjectDir)..\..\..\..\Documents\Arduino\libraries\DHT_sensor_library;$(ProjectDir)..\..\..\..\Documents\Arduino\libraries\U8g2\src;$(ProjectDir)..\..\..\..\AppData\Local\arduino15\packages\STM32\hardware\stm32\1.9.0\libraries\SoftwareSerial\src;$(ProjectDir)..\..\..\..\Documents\Arduino\libraries\ArduinoJson\src;$(ProjectDir)..\..\..\..\Documents\Arduino\libraries\Adafruit_Unified_Sensor;$(ProjectDir)..\..\..\..\AppData\Local\arduino15\packages\STM32\hardware\stm32\1.9.0\libraries\SPI\src;$(ProjectDir)..\..\..\..\AppData\Local\arduino15\packages\STM32\hardware\stm32\1.9.0\libraries\Wire\src;$(ProjectDir)..\..\..\..\AppData\Local\arduino15\packages\STM32\hardware\stm32\1.9.0\libraries\SrcWrapper\src;$(ProjectDir)..\..\..\..\AppData\Local\arduino15\packages\STM32\hardware\stm32\1.9.0\cores\arduino;$(ProjectDir)..\..\..\..\AppData\Local\arduino15\packages\STM32\hardware\stm32\1.9.0\cores\arduino\avr;$(ProjectDir)..\..\..\..\AppData\Local\arduino15\packages\STM32\hardware\stm32\1.9.0\cores\arduino\stm32;$(ProjectDir)..\..\..\..\AppData\Local\arduino15\packages\STM32\hardware\stm32\1.9.0\variants\NUCLEO_L432KC;$(ProjectDir)..\..\..\..\AppData\Local\arduino15\packages\STM32\hardware\stm32\1.9.0\cores\arduino\stm32\LL;$(ProjectDir)..\..\..\..\AppData\Local\arduino15\packages\STM32\hardware\stm32\1.9.0\cores\arduino\stm32\usb;$(ProjectDir)..\..\..\..\AppData\Local\arduino15\packages\STM32\hardware\stm32\1.9.0\cores\arduino\stm32\OpenAMP;$(ProjectDir)..\..\..\..\AppData\Local\arduino15\packages\STM32\hardware\stm32\1.9.0\cores\arduino\stm32\usb\hid;$(ProjectDir)..\..\..\..\AppData\Local\arduino15\packages\STM32\hardware\stm32\1.9.0\cores\arduino\stm32\usb\cdc;$(ProjectDir)..\..\..\..\AppData\Local\arduino15\packages\STM32\hardware\stm32\1.9.0\system\Drivers\STM32L4xx_HAL_Driver\Inc;$(ProjectDir)..\..\..\..\AppData\Local\arduino15\packages\STM32\hardware\stm32\1.9.0\system\Drivers\STM32L4xx_HAL_Driver\Src;$(ProjectDir)..\..\..\..\AppData\Local\arduino15\packages\STM32\hardware\stm32\1.9.0\system\STM32L4xx;$(ProjectDir)..\..\..\..\AppData\Local\arduino15\packages\STM32\hardware\stm32\1.9.0\system\Middlewares\ST\STM32_USB_Device_Library\Core\Inc;$(ProjectDir)..\..\..\..\AppData\Local\arduino15\packages\STM32\hardware\stm32\1.9.0\system\Middlewares\ST\STM32_USB_Device_Library\Core\Src;$(ProjectDir)..\..\..\..\AppData\Local\arduino15\packages\STM32\hardware\stm32\1.9.0\system\Middlewares\OpenAMP;$(ProjectDir)..\..\..\..\AppData\Local\arduino15\packages\STM32\hardware\stm32\1.9.0\system\Middlewares\OpenAMP\open-amp\lib\include;$(ProjectDir)..\..\..\..\AppData\Local\arduino15\packages\STM32\hardware\stm32\1.9.0\system\Middlewares\OpenAMP\libmetal\lib\include;$(ProjectDir)..\..\..\..\AppData\Local\arduino15\packages\STM32\hardware\stm32\1.9.0\system\Middlewares\OpenAMP\virtual_driver;$(ProjectDir)..\..\..\..\AppData\Local\arduino15\packages\STM32\tools\CMSIS\5.5.1\CMSIS\Core\Include\;$(ProjectDir)..\..\..\..\AppData\Local\arduino15\packages\STM32\hardware\stm32\1.9.0\system\Drivers\CMSIS\Device\ST\STM32L4xx\Include\;$(ProjectDir)..\..\..\..\AppData\Local\arduino15\packages\STM32\hardware\stm32\1.9.0\system\Drivers\CMSIS\Device\ST\STM32L4xx\Source\Templates\gcc\;$(ProjectDir)..\..\..\..\AppData\Local\arduino15\packages\STM32\tools\CMSIS\5.5.1\CMSIS\DSP\Include;$(ProjectDir)..\..\..\..\AppData\Local\arduino15\packages\arduino\tools\arm-none-eabi-gcc\4.8.3-2014q1\lib\gcc\arm-none-eabi\9.2.1;$(ProjectDir)..\..\..\..\AppData\Local\arduino15\packages\arduino\tools\arm-none-eabi-gcc\4.8.3-2014q1\arm-none-eabi;$(ProjectDir)..\..\..\..\AppData\Local\arduino15\packages\arduino\tools\arm-none-eabi-gcc\4.8.3-2014q1\arm-none-eabi\include;$(ProjectDir)..\..\..\..\AppData\Local\arduino15\packages\arduino\tools\arm-none-eabi-gcc\4.8.3-2014q1\arm-none-eabi\include\c++\9.2.1\arm-none-eabi;$(ProjectDir)..\..\..\..\AppData\Local\arduino15\packages\arduino\tools\arm-none-eabi-gcc\4.8.3-2014q1\arm-none-eabi\include\c++\9.2.1;$(ProjectDir)..\..\..\..\AppData\Local\arduino15\packages\arduino\tools\arm-none-eabi-gcc\4.8.3-2014q1\lib\gcc\arm-none-eabi\9.2.1\include;$(ProjectDir)..\..\..\..\AppData\Local\arduino15\packages\arduino\tools\arm-none-eabi-gcc\4.8.3-2014q1\arm-none-eabi\include\c++\9.2.1\tr1;$(ProjectDir)..\..\..\..\AppData\Local\arduino15\packages\arduino\tools\arm-none-eabi-gcc\4.8.3-2014q1\arm-none-eabi\include\sys;$(ProjectDir)..\..\..\..\AppData\Local\arduino15\packages\arduino\tools\arm-none-eabi-gcc\4.8.3-2014q1\arm-none-eabi\include\c++\9.2.1\arm-none-eabi\bits;$(ProjectDir)..\..\..\..\AppData\Local\arduino15\packages\arduino\tools\arm-none-eabi-gcc\4.8.3-2014q1\arm-none-eabi\include\c++\4.8.3;$(ProjectDir)..\..\..\..\AppData\Local\arduino15\packages\arduino\tools\arm-none-eabi-gcc\4.8.3-2014q1\arm-none-eabi\include\c++\4.8.3\arm-none-eabi;$(ProjectDir)..\..\..\..\AppData\Local\arduino15\packages\arduino\tools\arm-none-eabi-gcc\4.8.3-2014q1\arm-none-eabi\include\c++\4.8.3\bits;$(ProjectDir)..\..\..\..\AppData\Local\arduino15\packages\arduino\tools\arm-none-eabi-gcc\4.8.3-2014q1\arm-none-eabi\include;$(ProjectDir)..\..\..\..\AppData\Local\arduino15\packages\arduino\tools\arm-none-eabi-gcc\4.8.3-2014q1\arm-none-eabi\include\sys;$(ProjectDir)..\..\..\..\AppData\Local\arduino15\packages\STM32\hardware\stm32\1.9.0\system;$(ProjectDir)..\..\..\..\AppData\Local\arduino15\packages\STM32\hardware\stm32\avr;$(ProjectDir)..\..\..\..\AppData\Local\arduino15\packages\STM32\hardware\stm32\usb;$(ProjectDir)..\..\..\..\AppData\Local\arduino15\packages\arduino\tools\arm-none-eabi-gcc\4.8.3-2014q1\lib\gcc\arm-none-eabi\4.8.3\include;$(ProjectDir)..\..\..\..\AppData\Local\arduino15\packages\STM32\tools\CMSIS\5.5.1\Device\ATMEL\samd21\include\component;$(ProjectDir)..\..\..\..\AppData\Local\arduino15\packages\STM32\tools\CMSIS\CMSIS-Atmel\1.2.0\CMSIS\Device\ATMEL\samd21\include\component;$(ProjectDir)..\..\..\..\AppData\Local\arduino15\packages\STM32\tools\CMSIS\CMSIS-Atmel\1.2.0\CMSIS\Device\ATMEL\samd21\include\instance;$(ProjectDir)..\..\..\..\AppData\Local\arduino15\packages\STM32\tools\CMSIS\CMSIS-Atmel\1.1.0\CMSIS\Device\ATMEL\samd21\include\pio;$(ProjectDir)..\..\..\..\AppData\Local\arduino15\packages\STM32\tools\CMSIS\CMSIS-Atmel\1.2.0\CMSIS\Device\ATMEL\samd21\include\component;$(ProjectDir)..\..\..\..\AppData\Local\arduino15\packages\STM32\tools\CMSIS\5.5.1;$(ProjectDir)..\..\..\..\AppData\Local\arduino15\packages\STM32\tools\CMSIS\5.5.1\Device\ATMEL\samd21\include;$(ProjectDir)..\..\..\..\AppData\Local\arduino15\packages\STM32\tools\CMSIS\5.5.1\CMSIS\include;$(ProjectDir)..\..\..\..\AppData\Local\arduino15\packages\STM32\tools\CMSIS\5.5.1\Device\ATMEL\samd21\include\component;$(ProjectDir)..\..\..\..\AppData\Local\arduino15\packages\STM32\tools\CMSIS\5.5.1\Device\ATMEL\samd21\include\instance;$(ProjectDir)..\..\..\..\AppData\Local\arduino15\packages\STM32\tools\CMSIS\5.5.1\Device\ATMEL\samd21\include\pio;$(ProjectDir)..\..\..\..\AppData\Local\arduino15\packages\STM32\tools\CMSIS\5.5.1\Device\ATMEL\samd21\include\component;$(ProjectDir)..\..\..\..\AppData\Local\arduino15\packages\STM32\tools\CMSIS\CMSIS-Atmel\1.1.0\CMSIS\Device\ATMEL\samd21\include\component;$(ProjectDir)..\..\..\..\AppData\Local\arduino15\packages\STM32\tools\CMSIS\CMSIS-Atmel\1.1.0\CMSIS\Device\ATMEL\samd21\include\instance;$(ProjectDir)..\..\..\..\AppData\Local\arduino15\packages\STM32\tools\CMSIS\CMSIS-Atmel\1.1.0\CMSIS\Device\ATMEL\samd21\include\pio;$(ProjectDir)..\..\..\..\AppData\Local\arduino15\packages\STM32\tools\CMSIS\CMSIS-Atmel\1.1.0\CMSIS\Device\ATMEL\samd21\include\component;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <ForcedIncludeFiles>$(ProjectDir)__vm\.StmCoordinator.vsarduino.h;%(ForcedIncludeFiles)</ForcedIncludeFiles>
+      <IgnoreStandardIncludePath>true</IgnoreStandardIncludePath>
+      <PreprocessorDefinitions>_VMDEBUG_TOOL_stlinkv2;_VMDEBUG=1;STM32L4xx;ARDUINO=108013;ARDUINO_NUCLEO_L432KC;ARDUINO_ARCH_STM32;STM32L432xx;HAL_UART_MODULE_ENABLED;__cplusplus=201103L;_VMICRO_INTELLISENSE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ProjectCapability Include="VisualMicro" />
+  </ItemGroup>
+  <PropertyGroup>
+    <DebuggerFlavor>VisualMicroDebugger</DebuggerFlavor>
+  </PropertyGroup>
+  <ItemGroup>
+    <None Include="StmCoordinator.ino" />
+    <None Include="src\arduino folders read me.txt">
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="AgentBuffer.cpp" />
+    <ClCompile Include="AgentMsg.cpp" />
+    <ClCompile Include="AgentProtocol.cpp" />
+    <ClCompile Include="BaseBuffer.cpp" />
+    <ClCompile Include="Coordinator.cpp" />
+    <ClCompile Include="CtrlComponent.cpp" />
+    <ClCompile Include="DevBoardESP8266.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="AgentBuffer.h" />
+    <ClInclude Include="AgentMsg.h" />
+    <ClInclude Include="AgentProtocol.h" />
+    <ClInclude Include="BaseBuffer.h" />
+    <ClInclude Include="Coordinator.h" />
+    <ClInclude Include="CtrlComponent.h" />
+    <ClInclude Include="DevBoardESP8266.h" />
+    <ClInclude Include="__vm\.StmCoordinator.vsarduino.h" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+  <ProjectExtensions>
+    <VisualStudio>
+      <UserProperties config.Debug.customdebug_STM32_Nucleo_32_debugger_type="hwdebugger" config.Debug.customdebug_STM32_Nucleo_32_hwdebugger="stlinkv21" config.Debug.customdebug_STM32_Nucleo_32_vm_disable_optimization="vm_disable_opt_all" />
+    </VisualStudio>
+  </ProjectExtensions>
+</Project>

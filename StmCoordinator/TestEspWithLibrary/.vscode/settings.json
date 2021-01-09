@@ -1,0 +1,14 @@
+{
+	"files.associations": {
+		"__bit_reference": "cpp",
+		"__hash_table": "cpp",
+		"__string": "cpp",
+		"algorithm": "cpp",
+		"string": "cpp",
+		"string_view": "cpp",
+		"unordered_map": "cpp",
+		"*.tcc": "cpp",
+		"sstream": "cpp",
+		"istream": "cpp"
+	}
+}

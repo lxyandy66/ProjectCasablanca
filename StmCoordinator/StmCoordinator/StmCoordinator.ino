@@ -1,4 +1,5 @@
 
+
 #include <pt.h>
 
 
@@ -13,16 +14,24 @@
 #include <string.h>
 #include <SoftwareSerial.h>
 #include <ArduinoJson.h>
-#include"../Coordinator.h"
-#include"../Coordinator.cpp"
-#include"../CtrlComponent.h"
-#include"../CtrlComponent.cpp"
+#include"Coordinator.h"
+//#include<Coordinator.cpp>
+//#include"CtrlComponent.h"
+//#include"CtrlComponent.cpp"
+
+//#include"../Coordinator.cpp"
+//#include"../CtrlComponent.h"
+//#include"../CtrlComponent.cpp"
+//#include"../Coordinator.h"
+//#include"../Coordinator.cpp"
+//#include"../CtrlComponent.h"
+//#include"../CtrlComponent.cpp"
 
 #define PIN_OLED_SCL A4
 #define PIN_OLED_SDA A6 //MOSI
 #define PIN_OLED_DC A5
 #define PIN_DHT_DATA A3
-#define PIN_OLED_RST A2
+#define PIN_OLED_RST D12
 #define DHT_TYPE DHT22
 #define PIN_SS_RX D10
 #define PIN_SS_TX D11
@@ -36,15 +45,13 @@
 U8G2_SSD1306_128X64_NONAME_F_4W_SW_SPI u8g2(U8G2_R0, /* clock=*/ PIN_OLED_SCL,
   /* data=*/ PIN_OLED_SDA, /* cs=*/ U8X8_PIN_NONE, /* dc=*/ PIN_OLED_DC, /* reset=*/ PIN_OLED_RST);
 
-//初始化温湿度传感器
-DHT dht22(PIN_DHT_DATA, DHT_TYPE);
 
 String cmd;
 String tempBuffer;
 String tempDataBuffer;
 boolean ledOn = false;
-const String deviceID = "Coordinator_1";
-const String deviceType = "CoolingTower";
+const String deviceID = "Co_1";
+const String deviceType = AgentProtocol::TYPE_COORDINATOR;
 
 // extern "C" 
 Coordinator co(deviceID, deviceType); //？？？？
@@ -77,33 +84,39 @@ void processCmd(String cmd) {
 
 void setup() {
   Serial.begin(115200);
-  Serial.println("BEGIN!");
+  //Serial.println("BEGIN!");
   pinMode(PIN_LED, OUTPUT);
   u8g2.begin();
   co.setLedPin((unsigned long)PIN_LED);
-  Serial.println("Hello! after setledPin");
+  //Serial.println("Hello! after setledPin");
   printString("Hello!");
-  // PT_INIT(&trCoordinate);
+  PT_INIT(&trCoordinate);
   PT_INIT(&trBlinker);
 }
 void loop() {
-  // co.threadCoordinate(&trCoordinate);//启动coordinate线程，每秒进行优化
-  // co.threadBlinker(&trBlinker);//启动blinker线程，优化时点亮LED
+  co.threadCoordinate(&trCoordinate);//启动coordinate线程，每秒进行优化
+  co.threadBlinker(&trBlinker);//启动blinker线程，优化时点亮LED
   while (Serial.available()) {
     cmd = Serial.readString();
     ledOn = !ledOn;
     co.setNeedBlink(ledOn);
-    Serial.println("led should be " + String(ledOn ? "On" : "Off"));
-    Serial.println("CMD: " + cmd);
+    //Serial.println("led should be " + String(ledOn ? "On" : "Off"));
+    //Serial.println("CMD: " + cmd);
     AgentMsg tempMsg = AgentProtocol::parseFromString(cmd);
     // printString(cmd);
+<<<<<<< HEAD:StmCoordinator/StmCoordinator.ino
     if (tempMsg.boardId != "" && tempMsg.boardType != "") {
       Serial.println("received cmdType: " + tempMsg.cmdType);
+=======
+    if (tempMsg.boardId != "") {
+      //Serial.println("received cmdType: " + tempMsg.cmdType);
+>>>>>>> c40eba39a755b36db888f7a28f8f3330d9cbf6e5:StmCoordinator/StmCoordinator/StmCoordinator.ino
       co.addToBufferList(AgentBuffer::msgToAgentBuffer(tempMsg, co.getInputBuffer()));
     }
-    co.debugListPrint();
+    printString("DevType:" + String(co.getPoolSize()));
+    // co.debugListPrint();
     // Serial.
-    processCmd(cmd);//接收并格式化JSON对象，更新list
+    //processCmd(cmd);//接收并格式化JSON对象，更新list
   }
   // Serial.println("out of loop");
 }

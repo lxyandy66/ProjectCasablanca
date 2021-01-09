@@ -22,9 +22,8 @@ private:
 
 	std::vector<AgentBufferList> bufferListPool;
 	//实际为一个二位数组，一个维度是设备类型，另一个维度是设备ID，这个pool要coordinator来进行维护
-
-	String strBuffer;
 	long reqId;
+	int optPeriod = 1000;
 
 public:
 	Coordinator(String bdId, String bdType);
@@ -34,6 +33,9 @@ public:
 	double compLambda();//计算lamda值
 
 	Chrono getChrono();
+
+	int getPoolSize();
+	AgentBufferList* getListFromPoolById(int i);
 
 
 	String coordinateCalculate();//获取lambda和isConv的Json字符串

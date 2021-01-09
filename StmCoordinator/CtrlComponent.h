@@ -8,6 +8,7 @@
 #include <pt.h>
 #include <Chrono.h>
 #include <LightChrono.h>
+#include"AgentProtocol.h"
 
 
 
@@ -18,6 +19,8 @@ protected:
 	boolean needBlink;
 	String boardId;
 	String boardType;
+	long timeBuffer;
+	String strBuffer;
 	StaticJsonDocument<AgentProtocol::MSG_SIZE> jsonOut;//发送的buffer 64还不够
 	StaticJsonDocument<AgentProtocol::MSG_SIZE> jsonInputBuffer;//接收的buffer //继承的
 	StaticJsonDocument<AgentProtocol::DATA_SIZE> jsonData;//采集数据的buffer

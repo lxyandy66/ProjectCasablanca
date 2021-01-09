@@ -1,4 +1,7 @@
+#pragma once
+
 #include"AgentProtocol.h"
+#include<ArduinoJson.h>
 
 
 
@@ -25,16 +28,17 @@ const char* AgentProtocol::DATA_LAMBDA_FROM_JSON = "lm";
 const char* AgentProtocol::DATA_TEMP_FROM_JSON = "t";
 
 const char* AgentProtocol::TYPE_COOLING_TOWER = "ct";
+const char* AgentProtocol::TYPE_COORDINATOR = "co";
 
 AgentMsg AgentProtocol::parseFromString(String msg) {
 	AgentMsg temp;
 	DynamicJsonDocument jsonBuffer(AgentProtocol::MSG_SIZE);
 
 	DeserializationError t = deserializeJson(jsonBuffer, msg);
-	Serial.println("Msg from deserial" + String(t.c_str()));
+	// Serial.println("Msg from deserial" + String(t.c_str()));
 	if (t) {
-		Serial.println("in parse: get error");
-		Serial.println(t.c_str());
+		// Serial.println("in parse: get error");
+		// Serial.println(t.c_str());
 		return temp;
 	}
 	temp.boardId = jsonBuffer[AgentProtocol::DEV_ID_FROM_JSON].as<String>();

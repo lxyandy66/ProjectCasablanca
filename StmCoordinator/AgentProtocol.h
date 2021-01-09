@@ -29,6 +29,7 @@ public:
 
 	//定义整个系统中的设备类型
 	static const char* TYPE_COOLING_TOWER;
+	static const char* TYPE_COORDINATOR;
 
 	//统一定义json数组的大小
 	static const int MSG_SIZE = 256;//用于解析的json数组大小
