@@ -37,4 +37,5 @@ public:
 
 	static AgentMsg parseFromString(String msg);
 	static String toJsonString(AgentMsg msg);
+	static boolean isVaildMsg(AgentMsg msg);//用于验证消息是否有效
 };

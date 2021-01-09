@@ -37,8 +37,8 @@ AgentMsg AgentProtocol::parseFromString(String msg) {
 	DeserializationError t = deserializeJson(jsonBuffer, msg);
 	// Serial.println("Msg from deserial" + String(t.c_str()));
 	if (t) {
-		// Serial.println("in parse: get error");
-		// Serial.println(t.c_str());
+		Serial.println("in parse: get error");
+		Serial.println(t.c_str());
 		return temp;
 	}
 	temp.boardId = jsonBuffer[AgentProtocol::DEV_ID_FROM_JSON].as<String>();
@@ -51,4 +51,9 @@ AgentMsg AgentProtocol::parseFromString(String msg) {
 
 	return temp;
 
+}
+
+//用于验证消息是否有效
+boolean AgentProtocol::isVaildMsg(AgentMsg msg) {
+	return !(msg.boardId == "" || msg.boardType == "");
 }
