@@ -104,8 +104,13 @@ void loop() {
     //Serial.println("CMD: " + cmd);
     AgentMsg tempMsg = AgentProtocol::parseFromString(cmd);
     // printString(cmd);
+<<<<<<< HEAD:StmCoordinator/StmCoordinator.ino
+    if (tempMsg.boardId != "" && tempMsg.boardType != "") {
+      Serial.println("received cmdType: " + tempMsg.cmdType);
+=======
     if (tempMsg.boardId != "") {
       //Serial.println("received cmdType: " + tempMsg.cmdType);
+>>>>>>> c40eba39a755b36db888f7a28f8f3330d9cbf6e5:StmCoordinator/StmCoordinator/StmCoordinator.ino
       co.addToBufferList(AgentBuffer::msgToAgentBuffer(tempMsg, co.getInputBuffer()));
     }
     printString("DevType:" + String(co.getPoolSize()));

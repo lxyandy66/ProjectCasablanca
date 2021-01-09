@@ -110,18 +110,18 @@ void Coordinator::addToBufferList(AgentBuffer ab) {
 }
 
 void Coordinator::debugListPrint() {
-	// Serial.println("In debug: current BLP is " + String(bufferListPool.empty()) +
-	// 	" listType size is " + String(this->bufferListPool.size()));
+	Serial.println("In debugListPrint: current BLP is " + String(bufferListPool.empty()) +
+		" listType size is " + String(this->bufferListPool.size()));
 
-	for (int j = 0;j < this->bufferListPool.size();j++) {
-		//显示当前list的类型
-			//Serial.println("In " + this->bufferListPool[j].getListType() + " list");
-		for (int i = 0;i < bufferListPool[j].listSize();i++) {
-			//显示list每一项的信息
-			Serial.println(String(i) + " buffer: boardId: " + this->bufferListPool[j].getAgentBuffer(i)->getBoardId() +
-				" reqId: " + this->bufferListPool[j].getAgentBuffer(i)->getReqId());
-		}
-	}
+	// for (int j = 0;j < this->bufferListPool.size();j++) {
+	// 	//显示当前list的类型
+	// 	Serial.println("In " + this->bufferListPool[j].getListType() + " list");
+	// 	for (int i = 0;i < bufferListPool[j].listSize();i++) {
+	// 		//显示list每一项的信息
+	// 		Serial.println(String(i) + " buffer: boardId: " + this->bufferListPool[j].getAgentBuffer(i)->getBoardId() +
+	// 			" reqId: " + this->bufferListPool[j].getAgentBuffer(i)->getReqId());
+	// 	}
+	// }
 }
 
 int Coordinator::indexOfListType(String bdType) {

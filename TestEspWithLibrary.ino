@@ -42,7 +42,7 @@ DevBoardESP8266 wifi(&mySerial, &Serial, D3);
 const String deviceID = "Agent1";
 const String deviceType = AgentProtocol::TYPE_COOLING_TOWER;
 
-AgentMsg msgBuffer;
+
 String tempBuffer;
 
 Agent agent(deviceID, deviceType);
@@ -53,7 +53,7 @@ void setup()
 
   // Open serial communications and wait for port to open:
   //USB串口测试
-  Serial.begin(9600);
+  Serial.begin(115200);
   while (!Serial)
   {
     Serial.println("Goodnight moon!");
@@ -62,33 +62,33 @@ void setup()
 
   Serial.println("Debug Serial complete!");
 
-  agent.setWifiModule(wifi);
+  // agent.setWifiModule(wifi);
 
   // set the data rate for the SoftwareSerial port
-  mySerial.begin(9600);
-  while (!mySerial)
-  {
-    ;
-  }
-  Serial.println("SS initialized!");
-  wifi.hardReset();
+  // mySerial.begin(115200);
+  // while (!mySerial)
+  // {
+  //   ;
+  // }
+  // Serial.println("SS initialized!");
+  // wifi.hardReset();
 
-  //Wi-Fi连接测试
-  Serial.println(F("Connecting to WiFi..."));
-  boolean flag = wifi.connectToAP(F(ESP_SSID), F(ESP_PASS));
+  // //Wi-Fi连接测试
+  // Serial.println(F("Connecting to WiFi..."));
+  // boolean flag = wifi.connectToAP(F(ESP_SSID), F(ESP_PASS));
 
-  if (flag)
-  {
-    Serial.println("Connecting Success");
-  }
-  else
-  {
-    Serial.println("Connecting Failed");
-  }
+  // if (flag)
+  // {
+  //   Serial.println("Connecting Success");
+  // }
+  // else
+  // {
+  //   Serial.println("Connecting Failed");
+  // }
 
-  wifi.connectTCP(F(TCP_SERVER_ADDR), TCP_SERVER_PORT);
+  // wifi.connectTCP(F(TCP_SERVER_ADDR), TCP_SERVER_PORT);
 
-  Serial.println(F("Setup finished"));
+  // Serial.println(F("Setup finished"));
   agent.setSendOutput(&Serial);
   agent.setLedPin(PIN_LED);
 }
@@ -96,28 +96,20 @@ void setup()
 void loop()
 { // run over and over
   // if (mySerial.available())//暂时先不考虑wifi模块的软串口
-  if (mySerial.available() > 0) {
-
-    Serial.println("mySerial length: " + mySerial.available());
+  while (Serial.available()) {
     String msg = Serial.readString();
-    Serial.println("this is a msg: [" + msg + "] length: " + msg.length());
+    Serial.println("this is a msg: [" + msg + "]");
     // Serial.write(mySerial.read().toCharArray());
 
     //加入buffer之后自动解析
-    msgBuffer = AgentProtocol::parseFromString(msg);
-    if (!AgentProtocol::isVaildMsg(msgBuffer)) {
-      Serial.println("Invaild Msg! " + msg);
-      return;
-    }
-
-    agent.addToBuffer(CoordinatorBuffer::msgToCoordinatorBuffer(msgBuffer, agent.getInputBuffer()));
+    agent.addToBuffer(CoordinatorBuffer::msgToCoordinatorBuffer(AgentProtocol::parseFromString(msg), agent.getInputBuffer()));
     // processCmd(a);
     return;
   }
-  if (Serial.available())
-  {
-    mySerial.write(Serial.read());
-  }
+  // if (Serial.available())
+  // {
+  //   mySerial.write(Serial.read());
+  // }
 
 
 }
