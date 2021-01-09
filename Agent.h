@@ -6,6 +6,7 @@
 #include"CtrlComponent.h"
 #include"DevBoardESP8266.h"
 #include"AgentProtocol.h"
+#include"CoordinatorBuffer.h"
 
 
 class Agent : public CtrlComponent {

@@ -1,5 +1,6 @@
 #pragma once
 #include<Arduino.h>
+#include"AgentMsg.h"
 
 class AgentProtocol {
 	//本类用于处理从json消息中解析的内容

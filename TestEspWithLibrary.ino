@@ -1,7 +1,3 @@
-#include <ArduinoJson.h>
-#include <DHT.h>
-#include "../DevBoardESP8266.h"
-
 
 /*
   Software serial multple serial test
@@ -23,13 +19,22 @@
  */
 #include <SoftwareSerial.h>
 #include "DevBoardESP8266.h"
-#include"Agent.h"
+#include "Agent.h"
 
-#define ESP_SSID  "I am AB, How R U?"//"TP-LINK_hvac" "BlackBerry Hotspot"
-#define ESP_PASS  "woyeshiab"         // Your network password here "141242343"
+ // #define ESP_SSID  "I am AB, How R U?"//"TP-LINK_hvac" "BlackBerry Hotspot"
+ // #define ESP_PASS  "woyeshiab"         // Your network password here "141242343"
 
-#define TCP_SERVER_ADDR "192.168.1.104" //TCP服务器地址
-#define TCP_SERVER_PORT 8266            //TCP服务器地址
+ // #define TCP_SERVER_ADDR "192.168.1.104" //TCP服务器地址
+ // #define TCP_SERVER_PORT 8266            //TCP服务器地址
+
+#define ESP_SSID  "superb"//"TP-LINK_hvac" "BlackBerry Hotspot"
+#define ESP_PASS  "bugaosuni"         // Your network password here "141242343"
+ // #define ESP_SSID  "BlackBerry Hotspot"//"TP-LINK_hvac" 
+// #define ESP_PASS  "141242343"         // Your network password here "141242343"
+
+#define TCP_SERVER_ADDR "192.168.3.7" //TCP服务器地址
+#define TCP_SERVER_PORT 5230            //TCP服务器地址
+
 #define PIN_LED D2
 
 SoftwareSerial mySerial(10, 11); // RX, TX10, 11
@@ -50,10 +55,11 @@ void setup()
   Serial.begin(9600);
   while (!Serial)
   {
+    Serial.println("Goodnight moon!");
     ; // wait for serial port to connect. Needed for native USB port only
   }
 
-  Serial.println("Goodnight moon!");
+  Serial.println("Debug Serial complete!");
 
   // set the data rate for the SoftwareSerial port
   // mySerial.begin(9600);
