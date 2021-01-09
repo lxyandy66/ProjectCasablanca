@@ -27,12 +27,12 @@
  // #define TCP_SERVER_ADDR "192.168.1.104" //TCP服务器地址
  // #define TCP_SERVER_PORT 8266            //TCP服务器地址
 
-#define ESP_SSID  "superb"//"TP-LINK_hvac" "BlackBerry Hotspot"
-#define ESP_PASS  "bugaosuni"         // Your network password here "141242343"
- // #define ESP_SSID  "BlackBerry Hotspot"//"TP-LINK_hvac" 
-// #define ESP_PASS  "141242343"         // Your network password here "141242343"
+//#define ESP_SSID  "superb"//"TP-LINK_hvac" "BlackBerry Hotspot"
+//#define ESP_PASS  "bugaosuni"         // Your network password here "141242343"
+#define ESP_SSID  "BlackBerry Hotspot"//"TP-LINK_hvac" 
+#define ESP_PASS  "141242343"         // Your network password here "141242343"
 
-#define TCP_SERVER_ADDR "192.168.3.7" //TCP服务器地址
+#define TCP_SERVER_ADDR "192.168.43.12" //TCP服务器地址
 #define TCP_SERVER_PORT 5230            //TCP服务器地址
 
 #define PIN_LED D2

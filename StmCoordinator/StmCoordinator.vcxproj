@@ -110,6 +110,7 @@
     <None Include="StmCoordinator.ino" />
     <None Include="src\arduino folders read me.txt">
     </None>
+    <None Include="TestEspWithLibrary.ino" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AgentBuffer.cpp" />
