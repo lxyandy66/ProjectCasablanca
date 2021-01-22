@@ -36,3 +36,7 @@ CoordinatorBuffer CoordinatorBuffer::msgToCoordinatorBuffer(AgentMsg msg, JsonDo
 		(*jd)[AgentProtocol::DATA_ISCONV_FROM_JSON].as<boolean>(),
 		(*jd)[AgentProtocol::DATA_LAMBDA_FROM_JSON].as<double>());
 }
+
+String CoordinatorBuffer::whoAmI() {
+	return "id: " + this->boardId + " rqId: " + this->rqId;
+}

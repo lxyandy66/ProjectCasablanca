@@ -83,7 +83,7 @@ void processCmd(String cmd) {
 
 
 void setup() {
-  Serial.begin(115200);
+  Serial.begin(9600);
   //Serial.println("BEGIN!");
   pinMode(PIN_LED, OUTPUT);
   u8g2.begin();
@@ -104,13 +104,8 @@ void loop() {
     //Serial.println("CMD: " + cmd);
     AgentMsg tempMsg = AgentProtocol::parseFromString(cmd);
     // printString(cmd);
-<<<<<<< HEAD:StmCoordinator/StmCoordinator.ino
-    if (tempMsg.boardId != "" && tempMsg.boardType != "") {
-      Serial.println("received cmdType: " + tempMsg.cmdType);
-=======
     if (tempMsg.boardId != "") {
-      //Serial.println("received cmdType: " + tempMsg.cmdType);
->>>>>>> c40eba39a755b36db888f7a28f8f3330d9cbf6e5:StmCoordinator/StmCoordinator/StmCoordinator.ino
+      Serial.println("received cmdType: " + tempMsg.cmdType);
       co.addToBufferList(AgentBuffer::msgToAgentBuffer(tempMsg, co.getInputBuffer()));
     }
     printString("DevType:" + String(co.getPoolSize()));

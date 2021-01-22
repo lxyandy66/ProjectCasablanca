@@ -26,6 +26,8 @@ public:
 	double getLambda();
 	void setLambda(double lm);
 
+	String whoAmI();
+
 	static CoordinatorBuffer msgToCoordinatorBuffer(AgentMsg msg);
 	static CoordinatorBuffer msgToCoordinatorBuffer(AgentMsg msg, JsonDocument* jd);
 };

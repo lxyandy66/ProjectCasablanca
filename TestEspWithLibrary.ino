@@ -27,16 +27,19 @@
  // #define TCP_SERVER_ADDR "192.168.1.104" //TCP服务器地址
  // #define TCP_SERVER_PORT 8266            //TCP服务器地址
 
-//#define ESP_SSID  "superb"//"TP-LINK_hvac" "BlackBerry Hotspot"
-//#define ESP_PASS  "bugaosuni"         // Your network password here "141242343"
+#define ESP_SSID  "superb"//"TP-LINK_hvac" "BlackBerry Hotspot"
+#define ESP_PASS  "bugaosuni"         // Your network password here "141242343"
+#define TCP_SERVER_ADDR "192.168.3.7" //TCP服务器地址
+#define TCP_SERVER_PORT 8266            //TCP服务器地址
+
 // #define ESP_SSID  "BlackBerry Hotspot"//"TP-LINK_hvac" 
 // #define ESP_PASS  "141242343"         // Your network password here "141242343"
 
-#define ESP_SSID  "HMT-Freshmen"//"TP-LINK_hvac" 
-#define ESP_PASS  "stars15hmt"         // Your network password here "141242343"
+// #define ESP_SSID  "HMT-Freshmen"//"TP-LINK_hvac" 
+// #define ESP_PASS  "stars15hmt"         // Your network password here "141242343"
 
-#define TCP_SERVER_ADDR "172.16.33.234" //TCP服务器地址
-#define TCP_SERVER_PORT 5230            //TCP服务器地址
+// #define TCP_SERVER_ADDR "172.16.33.234" //TCP服务器地址
+// #define TCP_SERVER_PORT 5230            //TCP服务器地址
 
 #define PIN_LED D2
 
@@ -96,31 +99,39 @@ void setup()
   agent.setLedPin(PIN_LED);
 }
 
+String sendData;
+String dataRecvFromSerial;
 void loop()
 { // run over and over
   // if (mySerial.available())//暂时先不考虑wifi模块的软串口
   if (mySerial.available() > 0) {
 
-    Serial.println("mySerial length: " + mySerial.available());
-    String msg = preprocessMsgFromWifiModule(mySerial.readString());
-    Serial.println("this is a msg: [" + msg + "] length: " + msg.length());
+    agent.debugPrint("mySerial length: " + mySerial.available());
+    String msg = preprocessMsgFromWifiModule(mySerial.readStringUntil('\n'));
+    msg.trim();
+    agent.debugPrint("this is a msg: [" + msg + "] length: " + msg.length());
     // Serial.write(mySerial.read().toCharArray());
 
     //加入buffer之后自动解析
     msgBuffer = AgentProtocol::parseFromString(msg);
     if (!AgentProtocol::isVaildMsg(msgBuffer)) {
-      Serial.println("Invaild Msg! " + msg);
+      agent.debugPrint("Invaild Msg! " + msg);
       return;
     }
 
     agent.addToBuffer(CoordinatorBuffer::msgToCoordinatorBuffer(msgBuffer, agent.getInputBuffer()));
+    agent.debugPrint(agent.getCurrentBuffer().whoAmI());
     //发送的逻辑要考虑考虑
-    wifi.sendContent(agent.packAgentData());// processCmd(a);
+    sendData = agent.packAgentData();
+    agent.debugPrint("Data will be sent: " + sendData);
+    wifi.sendContent(sendData + "\r\n");// processCmd(a);
     return;
   }
   if (Serial.available())
   {
-    mySerial.write(Serial.read());
+    dataRecvFromSerial = Serial.readString();
+    agent.debugPrint("From serial: " + dataRecvFromSerial);
+    mySerial.write(dataRecvFromSerial.c_str());
   }
 
 

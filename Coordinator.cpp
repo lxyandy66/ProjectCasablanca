@@ -69,7 +69,7 @@ int Coordinator::threadCoordinate(struct pt* pt) {
 		PT_WAIT_UNTIL(pt, this->optChrono.hasPassed(this->optPeriod));
 		this->needBlink = true;
 		optChrono.restart();//重置计时器
-		sendMessage(packCoordinatorData());//发送数据
+		sendMessage(packCoordinatorData() + "\r\n");//发送数据
 		needBlink = false;
 	}
 	PT_END(pt);//这个宏定义的真是牛皮，宏里面带个大括号

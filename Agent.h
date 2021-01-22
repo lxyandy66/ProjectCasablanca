@@ -29,7 +29,7 @@ public:
 	String agentCaculate();//打包data的内容到json对象 
 	double compTemp();//计算Agent的内容 这个需要核实一下，/*agent有没有分类的*/
 	void addToBuffer(CoordinatorBuffer cb);//主要入口，更新buffer，判断是否需要解析
-
+	CoordinatorBuffer getCurrentBuffer();
 
 	String packAgentData();
 	void parseBuffer(CoordinatorBuffer cb);//对已解析的buffer进行分析并执行agent的计算

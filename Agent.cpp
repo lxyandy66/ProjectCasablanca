@@ -6,6 +6,8 @@
 Agent::Agent(String bdId, String bdType) :CtrlComponent(bdId, bdType) {}
 
 
+CoordinatorBuffer Agent::getCurrentBuffer() { return this->coBuffer; }
+
 void Agent::setWifiModule(DevBoardESP8266 wifi) {
 	this->wifiModule = wifi;
 }
