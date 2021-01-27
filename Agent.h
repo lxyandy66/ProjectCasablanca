@@ -33,8 +33,6 @@ public:
 
 	String packAgentData();
 	void parseBuffer(CoordinatorBuffer cb);//对已解析的buffer进行分析并执行agent的计算
-
-	/*多线程部分*/
-	//agent活动比较简单不设置多线程
-	// int threadAgent(struct pt* pt); //Agent线程,主要线程
+	/*Agent线程部分*/
+	int threadAgent(struct pt* pt, String msg) ;
 };

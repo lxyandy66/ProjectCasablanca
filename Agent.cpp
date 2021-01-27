@@ -1,6 +1,7 @@
 #pragma once
 #include"AgentProtocol.h"
 #include"Agent.h"
+#include <pt.h>
 
 
 Agent::Agent(String bdId, String bdType) :CtrlComponent(bdId, bdType) {}
@@ -77,4 +78,25 @@ void Agent::addToBuffer(CoordinatorBuffer cb) {
 void Agent::parseBuffer(CoordinatorBuffer cb) {
 	//parse和add我觉得要重新处理一下
 	this->sendMessage(packAgentData());//发送打包的data
+}
+
+int Agent::threadAgent(struct pt* pt, String msg) {
+	//coordinator线程
+	PT_BEGIN(pt);
+	//this->msgBuffer=*nullptr;
+	this->msgBuffer = AgentProtocol::parseFromString(msg);
+	debugPrint("this is a msg: [" + msg + "] length: " + msg.length());
+    if (!AgentProtocol::isVaildMsg(this->msgBuffer)) {
+      this->debugPrint("Invaild Msg! " + msg);
+      return -1;
+    }
+
+    this->addToBuffer(CoordinatorBuffer::msgToCoordinatorBuffer(this->msgBuffer, this->getInputBuffer()));
+    this->debugPrint(this->getCurrentBuffer().whoAmI());
+    //发送的逻辑要考虑考虑
+    this->strBuffer = this->packAgentData();
+    //this->debugPrint("Data will be sent: " + this->strBuffer);
+    this->wifiModule.sendContentDirectly(this->strBuffer);// processCmd(a);
+	//this->debugPrint("Send Success!");
+	PT_END(pt);//这个宏定义的真是牛皮，宏里面带个大括号
 }

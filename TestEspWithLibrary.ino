@@ -20,6 +20,7 @@
 #include <SoftwareSerial.h>
 #include "DevBoardESP8266.h"
 #include "Agent.h"
+#include<pt.h>
 
  // #define ESP_SSID  "I am AB, How R U?"//"TP-LINK_hvac" "BlackBerry Hotspot"
  // #define ESP_PASS  "woyeshiab"         // Your network password here "141242343"
@@ -34,23 +35,29 @@
 
 // #define ESP_SSID  "BlackBerry Hotspot"//"TP-LINK_hvac" 
 // #define ESP_PASS  "141242343"         // Your network password here "141242343"
+// #define TCP_SERVER_ADDR "192.168.43.139" //TCP服务器地址
+// #define TCP_SERVER_PORT 8266            //TCP服务器地址
 
 // #define ESP_SSID  "HMT-Freshmen"//"TP-LINK_hvac" 
 // #define ESP_PASS  "stars15hmt"         // Your network password here "141242343"
-
-// #define TCP_SERVER_ADDR "172.16.33.234" //TCP服务器地址
-// #define TCP_SERVER_PORT 5230            //TCP服务器地址
+// #define TCP_SERVER_ADDR "172.16.32.186" //TCP服务器地址
+// #define TCP_SERVER_PORT 8266            //TCP服务器地址
 
 #define PIN_LED D2
 
-SoftwareSerial mySerial(10, 11); // RX, TX10, 11
-DevBoardESP8266 wifi(&mySerial, &Serial, D3);
+
+DevBoardESP8266 wifi(&Serial1, &Serial, D3);
 const String deviceID = "Agent1";
 const String deviceType = AgentProtocol::TYPE_COOLING_TOWER;
 
-AgentMsg msgBuffer;
-String tempBuffer;
 
+String tempBuffer;
+String sendData;
+String dataRecvFromSerial;
+
+static struct pt trAgent;//coordinate线程指针
+
+HardwareSerial Serial1(PA10, PA9);//RX,TX
 Agent agent(deviceID, deviceType);
 
 void setup()
@@ -59,7 +66,9 @@ void setup()
 
   // Open serial communications and wait for port to open:
   //USB串口测试
-  Serial.begin(9600);
+  Serial.begin(115200);
+  Serial1.begin(115200);
+  Serial1.setTimeout(500);//需要控制串口读取数据的超时设置，否则无法分开多条数据
   while (!Serial)
   {
     Serial.println("Goodnight moon!");
@@ -68,16 +77,14 @@ void setup()
 
   Serial.println("Debug Serial complete!");
 
-  agent.setWifiModule(wifi);
 
   // set the data rate for the SoftwareSerial port
-  mySerial.begin(9600);
-  while (!mySerial)
+  while (!Serial1)
   {
     ;
   }
   Serial.println("SS initialized!");
-  wifi.hardReset();
+  //wifi.hardReset();
 
   //Wi-Fi连接测试
   Serial.println(F("Connecting to WiFi..."));
@@ -94,46 +101,30 @@ void setup()
 
   wifi.connectTCP(F(TCP_SERVER_ADDR), TCP_SERVER_PORT);
 
-  Serial.println(F("Setup finished"));
-  agent.setSendOutput(&mySerial);
+  wifi.setTransparentMode(true);
+
+  agent.setWifiModule(wifi);
+  agent.setSendOutput(&Serial1);
   agent.setLedPin(PIN_LED);
+  delay(20);
+  PT_INIT(&trAgent);
+  Serial.println(F("Setup finished"));
 }
 
-String sendData;
-String dataRecvFromSerial;
-void loop()
-{ // run over and over
-  // if (mySerial.available())//暂时先不考虑wifi模块的软串口
-  if (mySerial.available() > 0) {
 
-    agent.debugPrint("mySerial length: " + mySerial.available());
-    String msg = preprocessMsgFromWifiModule(mySerial.readStringUntil('\n'));
-    msg.trim();
-    agent.debugPrint("this is a msg: [" + msg + "] length: " + msg.length());
-    // Serial.write(mySerial.read().toCharArray());
+void loop() {
+  // Serial.println("Msg from TCP: " + Serial1.readString());
+  // Serial1.flush();
+  // Serial1.clear();
 
-    //加入buffer之后自动解析
-    msgBuffer = AgentProtocol::parseFromString(msg);
-    if (!AgentProtocol::isVaildMsg(msgBuffer)) {
-      agent.debugPrint("Invaild Msg! " + msg);
-      return;
-    }
 
-    agent.addToBuffer(CoordinatorBuffer::msgToCoordinatorBuffer(msgBuffer, agent.getInputBuffer()));
-    agent.debugPrint(agent.getCurrentBuffer().whoAmI());
-    //发送的逻辑要考虑考虑
-    sendData = agent.packAgentData();
-    agent.debugPrint("Data will be sent: " + sendData);
-    wifi.sendContent(sendData + "\r\n");// processCmd(a);
-    return;
-  }
-  if (Serial.available())
-  {
-    dataRecvFromSerial = Serial.readString();
-    agent.debugPrint("From serial: " + dataRecvFromSerial);
-    mySerial.write(dataRecvFromSerial.c_str());
+  if (Serial1.available()) {
+    //线程化可能好点
+    agent.threadAgent(&trAgent, Serial1.readString());
   }
 
+  // Serial.write(Serial1.read().toCharArray());
+  //加入buffer之后自动解析
 
 }
 

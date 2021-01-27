@@ -21,6 +21,7 @@ protected:
 	String boardType;
 	long timeBuffer;
 	String strBuffer;
+	AgentMsg msgBuffer;
 	StaticJsonDocument<AgentProtocol::MSG_SIZE> jsonOut;//发送的buffer 64还不够
 	StaticJsonDocument<AgentProtocol::MSG_SIZE> jsonInputBuffer;//接收的buffer //继承的
 	StaticJsonDocument<AgentProtocol::DATA_SIZE> jsonData;//采集数据的buffer

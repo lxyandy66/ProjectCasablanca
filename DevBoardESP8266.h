@@ -7,10 +7,10 @@
 
 #include <Arduino.h>
 
-#define ESP_RECEIVE_TIMEOUT 1000L  //!< Receive timeout for ESP8266
+#define ESP_RECEIVE_TIMEOUT 800L  //!< Receive timeout for ESP8266
 #define ESP_RESET_TIMEOUT 5000L    //!< Reset timeout for ESP8266
 #define ESP_CONNECT_TIMEOUT 15000L //!< Connection timeout for ESP8266
-#define ESP_IPD_TIMEOUT 120000L    //!< Receive network data timeout for ESP8266
+#define ESP_IPD_TIMEOUT 500L    //!< Receive network data timeout for ESP8266
 
 typedef const __FlashStringHelper Fstr; //!< PROGMEM/flash-resident string
 typedef const PROGMEM char Pchr;        //!< Ditto, kindasorta
@@ -22,7 +22,7 @@ typedef const PROGMEM char Pchr;        //!< Ditto, kindasorta
 class DevBoardESP8266 : public Print {
 public:
     DevBoardESP8266(Stream* s = &Serial, Stream* d = NULL, int8_t r = -1);
-    boolean hardReset(void), softReset(void), sendContent(Fstr* content), sendContent(String content),
+    boolean hardReset(void), softReset(void), sendContent(Fstr* content), sendContent(String content), sendContentDirectly(String content),
         find(Fstr* str = NULL, boolean ipd = false),
         connectToAP(Fstr* ssid, Fstr* pass), connectToAP(Fstr* ssid, Fstr* pass, boolean needChangeMode), connectTCP(Fstr* host, int port),
         requestURL(Fstr* url), requestURL(char* url);
@@ -32,7 +32,7 @@ public:
             uint32_t rst = ESP_RESET_TIMEOUT,
             uint32_t con = ESP_CONNECT_TIMEOUT,
             uint32_t ipd = ESP_IPD_TIMEOUT),
-        setBootMarker(Fstr* s = NULL);
+        setBootMarker(Fstr* s = NULL), setTransparentMode(boolean isDuplex);
 
 private:
     Stream* stream, // -> ESP8266, e.g. SoftwareSerial or Serial1

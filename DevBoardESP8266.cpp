@@ -475,3 +475,18 @@ boolean DevBoardESP8266:: sendContent(Fstr *content)
         }
         return false;
     }
+
+    boolean DevBoardESP8266::sendContentDirectly(String content){
+      println(content);
+      //debug->println("ESP: Send success!");
+      return true;
+    }
+
+    void DevBoardESP8266::setTransparentMode(boolean isDuplex=true){
+      println(F("AT+CIPMODE=1"));//进入透传模式
+      if(isDuplex){
+        delay(250);
+        println(F("AT+CIPSEND"));//允许直接发送信息
+      }
+      
+    }

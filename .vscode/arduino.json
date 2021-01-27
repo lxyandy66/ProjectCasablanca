@@ -2,5 +2,5 @@
     "board": "STM32:stm32:Nucleo_32",
     "configuration": "pnum=NUCLEO_L432KC,upload_method=MassStorage,xserial=generic,usb=none,xusb=FS,opt=osstd,rtlib=nano",
     "sketch": "TestEspWithLibrary.ino",
-    "port": "/dev/tty.usbmodem141403"
+    "port": "/dev/tty.usbmodem1413203"
 }
