@@ -15,19 +15,21 @@ const char* AgentProtocol::CMD_SEND = ("SEND");
 
 
 // 以下字符串均从串口获得的JSON字符串中取出
+//字段名
 const char* AgentProtocol::DEV_ID_FROM_JSON = ("id");
 const char* AgentProtocol::REQ_ID_FROM_JSON = ("rq");
 const char* AgentProtocol::RESP_ID_FROM_JSON = ("rp");
 const char* AgentProtocol::CMD_TYPE_FROM_JSON = ("cmd");
 const char* AgentProtocol::COMPUTE_TIME_FROM_JSON = ("ct");
 const char* AgentProtocol::DEV_TYPE_FROM_JSON = "tp";
-
 const char* AgentProtocol::DATA_FROM_JSON = ("dt");
 const char* AgentProtocol::DATA_ISCONV_FROM_JSON = "cv";
 const char* AgentProtocol::DATA_LAMBDA_FROM_JSON = "lm";
 const char* AgentProtocol::DATA_TEMP_FROM_JSON = "t";
 
 const char* AgentProtocol::TYPE_COOLING_TOWER = "ct";
+const char* AgentProtocol::TYPE_CHILLER = "chi";
+
 const char* AgentProtocol::TYPE_COORDINATOR = "co";
 
 AgentMsg AgentProtocol::parseFromString(String msg) {

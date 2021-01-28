@@ -36,6 +36,9 @@ public:
 
 	int getPoolSize();
 	AgentBufferList* getListFromPoolById(int i);
+	AgentBufferList* getListFromPoolByType(String ty);
+
+	int getTotalAgentNumber();//获取Pool中所有List内所有Agent个数
 
 
 	String coordinateCalculate();//获取lambda和isConv的Json字符串

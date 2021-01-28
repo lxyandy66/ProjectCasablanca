@@ -52,4 +52,6 @@ public:
 	void updateAgentBuffer(AgentBuffer ab);
 	boolean isNewerThanExist(AgentBuffer ab, int index);
 
+	double meanValue();//获取AgentBuffer的平均值
+
 };

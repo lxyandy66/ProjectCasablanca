@@ -16,7 +16,7 @@ class CtrlComponent {
 
 protected:
 	unsigned long pinLed;//LED不能少
-	boolean needBlink;
+	boolean needBlink;//LED提示变量
 	String boardId;
 	String boardType;
 	long timeBuffer;
@@ -38,6 +38,8 @@ public:
 
 	/*LED相关*/
 	int threadBlinker(struct pt* pt);//blinker线程,通过needBlink异步控制LED
+	int threadBlinkerOnce(struct pt* pt, int blinkDuration = 500);//blinker线程,不阻塞主线程情况闪烁一次
+
 	void setLedPin(unsigned long p);
 	unsigned long getLedPin();
 	void setNeedBlink(boolean b);

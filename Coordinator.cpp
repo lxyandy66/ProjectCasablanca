@@ -9,7 +9,7 @@
 #include"AgentProtocol.h"
 //#include"AgentProtocol.cpp"
 #include<vector>
-
+#include<math.h>
 
 
 
@@ -28,10 +28,15 @@ Chrono Coordinator::getChrono() { return this->optChrono; }
 
 boolean Coordinator::isConverge() {
 	//计算是否收敛
-	return true;
+	if(this->getPoolSize()<2)
+		return false;//如果当前的pool小于2，显然不会有两类设备
+	return fabs(this->getListFromPoolByType(AgentProtocol::TYPE_COOLING_TOWER)->meanValue()-
+	this->getListFromPoolByType(AgentProtocol::TYPE_CHILLER)->meanValue())<0.05;
 }
+
+
 double Coordinator::compLambda() {
-	return 0.01;//计算lamda值
+	return this->getPoolSize()+0.01*this->getTotalAgentNumber();//计算lamda值
 }
 
 String Coordinator::coordinateCalculate() {
@@ -142,4 +147,22 @@ AgentBufferList* Coordinator::getListFromPoolById(int i) {
 	if (i >= bufferListPool.size())
 		return nullptr;
 	return &(this->bufferListPool[i]);
+}
+
+AgentBufferList* Coordinator::getListFromPoolByType(String ty) {
+	if (this->bufferListPool.size()==0)
+		return nullptr;
+	for(int i=0;i<bufferListPool.size();i++){
+		if(this->bufferListPool[i].getListType()==ty)
+			return &(this->bufferListPool[i]);
+	}
+	return nullptr;
+}
+
+int Coordinator::getTotalAgentNumber(){
+	int sum=0;
+	for(int i=0;i<this->bufferListPool.size();i++){
+		sum=sum+bufferListPool[i].listSize();
+	}
+	return sum;
 }

@@ -106,3 +106,15 @@ String AgentBufferList::getListType() {
 	return this->listType;
 }
 void AgentBufferList::setListType(String str) { this->listType = str; }
+
+
+double AgentBufferList::meanValue(){
+	//获取list中各buffer的平均值
+	if(list.size()==0)
+		return -1;
+	double sum=0;
+	for(int i=0;i<this->list.size();i++){
+		sum+=list[i].getData();
+	}
+	return sum/this->list.size();
+}

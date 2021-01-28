@@ -83,7 +83,8 @@ void processCmd(String cmd) {
 
 
 void setup() {
-  Serial.begin(9600);
+  Serial.begin(115200);
+  Serial.setTimeout(500);
   //Serial.println("BEGIN!");
   pinMode(PIN_LED, OUTPUT);
   u8g2.begin();
@@ -95,17 +96,13 @@ void setup() {
 }
 void loop() {
   co.threadCoordinate(&trCoordinate);//启动coordinate线程，每秒进行优化
-  co.threadBlinker(&trBlinker);//启动blinker线程，优化时点亮LED
   while (Serial.available()) {
     cmd = Serial.readString();
-    ledOn = !ledOn;
-    co.setNeedBlink(ledOn);
-    //Serial.println("led should be " + String(ledOn ? "On" : "Off"));
-    //Serial.println("CMD: " + cmd);
     AgentMsg tempMsg = AgentProtocol::parseFromString(cmd);
     // printString(cmd);
-    if (tempMsg.boardId != "") {
-      Serial.println("received cmdType: " + tempMsg.cmdType);
+    if (AgentProtocol::isVaildMsg(tempMsg)) {
+      co.threadBlinkerOnce(&trBlinker);//收到合法的消息时闪烁一次
+      // Serial.println("received cmdType: " + tempMsg.cmdType);
       co.addToBufferList(AgentBuffer::msgToAgentBuffer(tempMsg, co.getInputBuffer()));
     }
     printString("DevType:" + String(co.getPoolSize()));

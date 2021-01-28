@@ -15,7 +15,7 @@ String CtrlComponent::getBoardType() { return this->boardType; }
 // CtrlComponent::~CtrlComponent() {}
 
 int CtrlComponent::threadBlinker(struct pt* pt) {
-	//LED控制线程
+	//LED控制线程, 通过内置的boolean变量控制，常驻线程
 	PT_BEGIN(pt);
 	while (true) {
 		PT_WAIT_UNTIL(pt, this->needBlink);//持续监听needBlink变量
@@ -28,6 +28,16 @@ int CtrlComponent::threadBlinker(struct pt* pt) {
 	PT_END(pt);
 }
 
+int CtrlComponent::threadBlinkerOnce(struct pt* pt, int blinkDuration) {
+	//LED控制线程，用于不阻塞主线程时闪烁
+	PT_BEGIN(pt);
+	int starter = millis();
+	this->changeLed(true);
+	PT_WAIT_UNTIL(pt, millis() - starter > blinkDuration);//持续监听needBlink变量
+	this->changeLed(false);
+	// this->debugPrint("in the class, set led as off");
+	PT_END(pt);
+}
 
 void CtrlComponent::changeLed(boolean b) {
 	digitalWrite(this->pinLed, b);
