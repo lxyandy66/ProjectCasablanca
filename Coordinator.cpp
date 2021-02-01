@@ -17,7 +17,11 @@
 
 
 Coordinator::Coordinator(String bdId, String bdType) :CtrlComponent(bdId, bdType) {
-	//仅初始化AgentBufferList
+	//本地缓存值初始化
+	this->localLambda=-1;//lambda本地缓存
+	this->localConverge=false;
+
+	//初始化AgentBufferList
 	this->bufferListPool = std::vector<AgentBufferList>();
 }
 // Coordinator::Coordinator() {}
@@ -26,17 +30,20 @@ Coordinator::Coordinator(String bdId, String bdType) :CtrlComponent(bdId, bdType
 Chrono Coordinator::getChrono() { return this->optChrono; }
 
 
-boolean Coordinator::isConverge() {
+boolean Coordinator::isConverge(double meanChiTemp,double meanCoolingTowerTemp) {
 	//计算是否收敛
 	if(this->getPoolSize()<2)
 		return false;//如果当前的pool小于2，显然不会有两类设备
-	return fabs(this->getListFromPoolByType(AgentProtocol::TYPE_COOLING_TOWER)->meanValue()-
-	this->getListFromPoolByType(AgentProtocol::TYPE_CHILLER)->meanValue())<0.05;
+	return fabs(meanCoolingTowerTemp-meanChiTemp)<0.05;
 }
 
 
-double Coordinator::compLambda() {
-	return this->getPoolSize()+0.01*this->getTotalAgentNumber();//计算lamda值
+double Coordinator::compLambda(double meanChiTemp,double meanCoolingTowerTemp) {
+	if(this->localConverge)
+		return localLambda;
+		//计算lamda值
+	return localLambda + 0.00000005 * 4.2 * 410.6 * 
+		this->getListFromPoolByType(AgentProtocol::TYPE_CHILLER)->listSize() * (meanCoolingTowerTemp - meanChiTemp);
 }
 
 String Coordinator::coordinateCalculate() {
@@ -44,8 +51,14 @@ String Coordinator::coordinateCalculate() {
 	this->jsonData.clear();
 	strBuffer = "";
 	this->timeBuffer = micros();
-	jsonData[AgentProtocol::DATA_ISCONV_FROM_JSON] = isConverge();
-	jsonData[AgentProtocol::DATA_LAMBDA_FROM_JSON] = compLambda();
+	//计算一些前置参数
+	double meanChiTemp=this->meanValueByList(AgentProtocol::TYPE_CHILLER);
+	double meanCoolingTowerTemp=this->meanValueByList(AgentProtocol::TYPE_COOLING_TOWER);
+	
+	this->localConverge=isConverge(meanChiTemp,meanCoolingTowerTemp);
+	jsonData[AgentProtocol::DATA_ISCONV_FROM_JSON] = this->localConverge;
+	this->localLambda=compLambda(meanChiTemp,meanCoolingTowerTemp);
+	jsonData[AgentProtocol::DATA_LAMBDA_FROM_JSON] = this->localLambda;
 	this->timeBuffer = micros() - this->timeBuffer;
 	serializeJson(jsonData, strBuffer);
 	return strBuffer;
@@ -59,8 +72,15 @@ String Coordinator::packCoordinatorData() {
 	jsonOut[AgentProtocol::CMD_TYPE_FROM_JSON] = "SEND";//目前统统都是send
 	jsonOut[AgentProtocol::REQ_ID_FROM_JSON] = ++this->reqId;
 	jsonOut[AgentProtocol::RESP_ID_FROM_JSON] = -1;//AgentProtocol::RESP_ID_FROM_JSON
-	jsonOut[AgentProtocol::DATA_FROM_JSON] = coordinateCalculate();
-	jsonOut[AgentProtocol::COMPUTE_TIME_FROM_JSON] = this->timeBuffer;//Arduino Uno上，精度为4微秒
+	if(!canStartCoordinateCaculate()){
+		//如果不能直接返回一个随便的
+		jsonOut[AgentProtocol::DATA_FROM_JSON] ="{\"cv\":false,\"lm\":-1}";
+		jsonOut[AgentProtocol::COMPUTE_TIME_FROM_JSON]=-1;
+	}else{
+		jsonOut[AgentProtocol::DATA_FROM_JSON] = coordinateCalculate();
+		jsonOut[AgentProtocol::COMPUTE_TIME_FROM_JSON] = this->timeBuffer;
+	}
+	//Arduino Uno上，精度为4微秒
 	strBuffer = "";//serialize对字符串只能追加
 	serializeJson(jsonOut, strBuffer);//用scoop库会报错
 	return strBuffer;
@@ -165,4 +185,20 @@ int Coordinator::getTotalAgentNumber(){
 		sum=sum+bufferListPool[i].listSize();
 	}
 	return sum;
+}
+
+double Coordinator::meanValueByList(String type){
+	AgentBufferList* list=this->getListFromPoolByType(type);
+	if(list==nullptr)
+		return -999;
+	return list->meanValue();
+}
+
+boolean Coordinator::canStartCoordinateCaculate(){
+if (this->bufferListPool.size()==0)
+return false;//pool里面起码不能为空
+if(this->getListFromPoolByType(AgentProtocol::TYPE_CHILLER)==nullptr||
+this->getListFromPoolByType(AgentProtocol::TYPE_COOLING_TOWER)==nullptr)
+return false;//显然两者起码不能同时为空
+return true;
 }

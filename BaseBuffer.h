@@ -13,5 +13,5 @@ public:
 	BaseBuffer(String id, String bdType, long rq);
 	String getBoardId();
 	String getBoardType();
-	int getReqId();
+	long getReqId();
 };

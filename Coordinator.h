@@ -20,6 +20,9 @@ private:
 	Chrono optChrono;//节拍器,coordinator用
 	boolean needBlink;//加个flag
 
+	double localLambda;//lambda本地缓存
+	boolean localConverge;//是否收敛本地缓存
+
 	std::vector<AgentBufferList> bufferListPool;
 	//实际为一个二位数组，一个维度是设备类型，另一个维度是设备ID，这个pool要coordinator来进行维护
 	long reqId;
@@ -29,8 +32,8 @@ public:
 	Coordinator(String bdId, String bdType);
 	// Coordinator();
 	// ~Coordinator();
-	boolean isConverge();//计算是否收敛
-	double compLambda();//计算lamda值
+	boolean isConverge(double meanChiTemp, double meanCoolingTowerTemp);//计算是否收敛
+	double compLambda(double meanChiTemp, double meanCoolingTowerTemp);//计算lamda值
 
 	Chrono getChrono();
 
@@ -55,5 +58,9 @@ public:
 	int indexOfListType(String bdType);//判断在pool中是否存在同设备类型的list
 
 	void debugListPrint();
+
+	double meanValueByList(String ty);
+
+	boolean canStartCoordinateCaculate();//判断是否有了agent的基本数据
 
 };

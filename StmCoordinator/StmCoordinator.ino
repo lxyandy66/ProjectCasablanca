@@ -71,17 +71,6 @@ void printString(String cmd) {
 }
 
 
-
-
-void processCmd(String cmd) {
-  Serial.print("CMD: " + cmd);
-  if (cmd.indexOf("SET+LED") != -1) {
-    // co.changeLed();
-    return;
-  }
-}
-
-
 void setup() {
   Serial.begin(115200);
   Serial.setTimeout(500);

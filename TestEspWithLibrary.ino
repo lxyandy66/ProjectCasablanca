@@ -19,7 +19,10 @@
  */
 #include <SoftwareSerial.h>
 #include "DevBoardESP8266.h"
-#include "Agent.h"
+#include "BaseAgent.h"
+#include"AgentFactory.h"
+#include"CoolingTowerAgent.h"
+#include"ChillerAgent.h"
 #include<pt.h>
 
  // #define ESP_SSID  "I am AB, How R U?"//"TP-LINK_hvac" "BlackBerry Hotspot"
@@ -47,8 +50,6 @@
 
 
 DevBoardESP8266 wifi(&Serial1, &Serial, D3);
-const String deviceID = "Agent1";
-const String deviceType = AgentProtocol::TYPE_COOLING_TOWER;
 
 
 String tempBuffer;
@@ -56,9 +57,11 @@ String sendData;
 String dataRecvFromSerial;
 
 static struct pt trAgent;//coordinate线程指针
+static struct pt trBlinker;//LED提示用
 
 HardwareSerial Serial1(PA10, PA9);//RX,TX
-Agent agent(deviceID, deviceType);
+
+BaseAgent* agent = AgentFactory::createAgent(AgentType::CHILLER, "CH_1");
 
 void setup()
 {
@@ -103,52 +106,25 @@ void setup()
 
   wifi.setTransparentMode(true);
 
-  agent.setWifiModule(wifi);
-  agent.setSendOutput(&Serial1);
-  agent.setLedPin(PIN_LED);
+  agent->setWifiModule(wifi);
+  agent->setSendOutput(&Serial1);
+  agent->setLedPin(PIN_LED);
   delay(20);
   PT_INIT(&trAgent);
+  PT_INIT(&trBlinker);
   Serial.println(F("Setup finished"));
 }
 
 
 void loop() {
-  // Serial.println("Msg from TCP: " + Serial1.readString());
-  // Serial1.flush();
-  // Serial1.clear();
-
-
   if (Serial1.available()) {
     //线程化可能好点
-    agent.threadAgent(&trAgent, Serial1.readString());
-  }
-
-  // Serial.write(Serial1.read().toCharArray());
-  //加入buffer之后自动解析
-
-}
-
-String preprocessMsgFromWifiModule(String orgMsg) {
-  //直接从wifi模块里面获取的信息带头尾, 例如"+IPD,93:{"id":"Co_1","tp":...}"
-  return orgMsg.substring(orgMsg.indexOf(":") + 1);
-}
-
-void getIpAddress()
-{
-  // IP addr check isn't part of library yet, but
-  // we can manually request and place in a string.
-  char buffer[50];
-  wifi.println(F("AT+CIFSR"));
-  if (wifi.readLine(buffer, sizeof(buffer)))
-  {
-    Serial.println(buffer);
-    wifi.find(); // Discard the 'OK' that follows
-  }
-  else
-  { // IP addr check failed
-    Serial.println(F("error"));
+    agent->threadAgent(&trAgent, Serial1.readString());
+    agent->threadBlinkerOnce(&trBlinker, 500);
   }
 }
+
+
 
 
 

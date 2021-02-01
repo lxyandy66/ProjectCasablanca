@@ -28,20 +28,20 @@
 #pragma once
 #include "DevBoardESP8266.h"
 
-/**************************************************************************/
-/*!
-    @brief  Constructor
-    @param    serial_stream
-              Pointer to Stream (Hardware or Software Serial) for the ESP8266
-    @param    debug_stream
-              Pointer to Stream (Hardware or Software Serial) for debug out
-    @param resetpin Reset pin
-*/
-/**************************************************************************/
-DevBoardESP8266::DevBoardESP8266(Stream *serial_stream, Stream *debug_stream,
-                                   int8_t resetpin)
-    : stream(serial_stream), debug(debug_stream), reset_pin(resetpin),
-      host(NULL), writing(false)
+ /**************************************************************************/
+ /*!
+     @brief  Constructor
+     @param    serial_stream
+               Pointer to Stream (Hardware or Software Serial) for the ESP8266
+     @param    debug_stream
+               Pointer to Stream (Hardware or Software Serial) for debug out
+     @param resetpin Reset pin
+ */
+ /**************************************************************************/
+DevBoardESP8266::DevBoardESP8266(Stream* serial_stream, Stream* debug_stream,
+  int8_t resetpin)
+  : stream(serial_stream), debug(debug_stream), reset_pin(resetpin),
+  host(NULL), writing(false)
 {
   setTimeouts();
 };
@@ -58,7 +58,7 @@ DevBoardESP8266::DevBoardESP8266(Stream *serial_stream, Stream *debug_stream,
 */
 /**************************************************************************/
 void DevBoardESP8266::setTimeouts(uint32_t rcv, uint32_t rst, uint32_t con,
-                                   uint32_t ipd)
+  uint32_t ipd)
 {
   if (rcv)
   {
@@ -80,7 +80,7 @@ void DevBoardESP8266::setTimeouts(uint32_t rcv, uint32_t rst, uint32_t con,
             The bootmarker string to look for
 */
 /**************************************************************************/
-void DevBoardESP8266::setBootMarker(Fstr *str)
+void DevBoardESP8266::setBootMarker(Fstr* str)
 {
   bootMarker = str ? str : defaultBootMarker;
 }
@@ -124,7 +124,7 @@ size_t DevBoardESP8266::write(uint8_t c)
     (any further pending input remains in stream), false if timeout occurs.
 */
 /**************************************************************************/
-boolean DevBoardESP8266::find(Fstr *str, boolean ipd)
+boolean DevBoardESP8266::find(Fstr* str, boolean ipd)
 {
   uint8_t stringLength, matchedLength = 0;
   int c;
@@ -140,7 +140,7 @@ boolean DevBoardESP8266::find(Fstr *str, boolean ipd)
 
   if (str == NULL)
     str = F("OK\r\n");
-  stringLength = strlen_P((Pchr *)str);
+  stringLength = strlen_P((Pchr*)str);
 
   if (debug && writing)
   {
@@ -183,7 +183,7 @@ boolean DevBoardESP8266::find(Fstr *str, boolean ipd)
       if (debug)
         debug->write(c); // Copy to debug stream
       bytesToGo--;
-      if (c == pgm_read_byte((Pchr *)str + matchedLength))
+      if (c == pgm_read_byte((Pchr*)str + matchedLength))
       { // Match next byte?
         if (++matchedLength == stringLength)
         {               // Matched whole string?
@@ -223,7 +223,7 @@ bail: // Sorry, dreaded goto.  Because nested loops.
     @returns Bytes read
 */
 /**************************************************************************/
-int DevBoardESP8266::readLine(char *buf, int bufSiz)
+int DevBoardESP8266::readLine(char* buf, int bufSiz)
 {
   if (debug && writing)
   {
@@ -316,7 +316,7 @@ void DevBoardESP8266::debugLoop(void)
     @returns true on successful connection, false otherwise.
 */
 /**************************************************************************/
-boolean DevBoardESP8266::connectToAP(Fstr *ssid, Fstr *pass)
+boolean DevBoardESP8266::connectToAP(Fstr* ssid, Fstr* pass)
 {
 
   print(F("AT+CWJAP=\"")); // Join access point
@@ -331,20 +331,20 @@ boolean DevBoardESP8266::connectToAP(Fstr *ssid, Fstr *pass)
 
   return found;
 }
-boolean DevBoardESP8266::connectToAP(Fstr *ssid, Fstr *pass, boolean needChangeMode)
+boolean DevBoardESP8266::connectToAP(Fstr* ssid, Fstr* pass, boolean needChangeMode)
 {
   if (needChangeMode)
-  { 
+  {
     char buf[256];
     println(F("AT+CWMODE=1")); // WiFi mode = Sta
     readLine(buf, sizeof(buf));
-    if (!(strstr_P(buf, (Pchr *)F("OK")) ||
-          strstr_P(buf, (Pchr *)F("no change"))))
+    if (!(strstr_P(buf, (Pchr*)F("OK")) ||
+      strstr_P(buf, (Pchr*)F("no change"))))
       return false;
   }
 
-  boolean found=connectToAP(ssid, pass);
-  
+  boolean found = connectToAP(ssid, pass);
+
   if (found)
   {
     println(F("AT+CIPMUX=0")); // Set single-client mode
@@ -373,7 +373,7 @@ void DevBoardESP8266::closeAP(void)
     @returns true on successful connection, else false.
 */
 /**************************************************************************/
-boolean DevBoardESP8266::connectTCP(Fstr *hoststr, int port)
+boolean DevBoardESP8266::connectTCP(Fstr* hoststr, int port)
 {
 
   print(F("AT+CIPSTART=\"TCP\",\""));
@@ -407,10 +407,10 @@ void DevBoardESP8266::closeTCP(void)
     @returns true if request issued successfully, else false.
 */
 /**************************************************************************/
-boolean DevBoardESP8266::requestURL(Fstr *url)
+boolean DevBoardESP8266::requestURL(Fstr* url)
 {
   print(F("AT+CIPSEND="));
-  println(25 + strlen_P((Pchr *)url) + strlen_P((Pchr *)host));
+  println(25 + strlen_P((Pchr*)url) + strlen_P((Pchr*)host));
   if (find(F("> ")))
   {                   // Wait for prompt
     print(F("GET ")); // 4
@@ -433,10 +433,10 @@ find() function. (Can call find(F("Unlink"), true) to dump to debug.)
    @returns true if request issued successfully, else false.
 */
 /**************************************************************************/
-boolean DevBoardESP8266::requestURL(char *url)
+boolean DevBoardESP8266::requestURL(char* url)
 {
   print(F("AT+CIPSEND="));
-  println(25 + strlen(url) + strlen_P((Pchr *)host));
+  println(25 + strlen(url) + strlen_P((Pchr*)host));
   if (find(F("> ")))
   {                   // Wait for prompt
     print(F("GET ")); // 4
@@ -450,43 +450,58 @@ boolean DevBoardESP8266::requestURL(char *url)
 }
 
 
-boolean DevBoardESP8266:: sendContent(Fstr *content)
-    {
-        print(F("AT+CIPSEND="));
-        println(25 + strlen_P((Pchr *)content));
-        if (find(F("> ")))
-        { // Wait for prompt
-            print(content);
-            print(F("\r\n\r\n")); // 4
-            return (find());      // Gets 'SEND OK' line
-        }
-        return false;
-    }
+boolean DevBoardESP8266::sendContent(Fstr* content)
+{
+  print(F("AT+CIPSEND="));
+  println(25 + strlen_P((Pchr*)content));
+  if (find(F("> ")))
+  { // Wait for prompt
+    print(content);
+    print(F("\r\n\r\n")); // 4
+    return (find());      // Gets 'SEND OK' line
+  }
+  return false;
+}
 
-    boolean DevBoardESP8266:: sendContent(String content)
-    {
-        print(F("AT+CIPSEND="));
-        println(content.length());
-        if (find(F("> ")))
-        { // Wait for prompt
-            print(content);
-            print(F("\r\n\r\n")); // 4
-            return (find());      // Gets 'SEND OK' line
-        }
-        return false;
-    }
+boolean DevBoardESP8266::sendContent(String content)
+{
+  print(F("AT+CIPSEND="));
+  println(content.length());
+  if (find(F("> ")))
+  { // Wait for prompt
+    print(content);
+    print(F("\r\n\r\n")); // 4
+    return (find());      // Gets 'SEND OK' line
+  }
+  return false;
+}
 
-    boolean DevBoardESP8266::sendContentDirectly(String content){
-      println(content);
-      //debug->println("ESP: Send success!");
-      return true;
-    }
+boolean DevBoardESP8266::sendContentDirectly(String content) {
+  println(content);
+  //debug->println("ESP: Send success!");
+  return true;
+}
 
-    void DevBoardESP8266::setTransparentMode(boolean isDuplex=true){
-      println(F("AT+CIPMODE=1"));//进入透传模式
-      if(isDuplex){
-        delay(250);
-        println(F("AT+CIPSEND"));//允许直接发送信息
-      }
-      
-    }
+void DevBoardESP8266::setTransparentMode(boolean isDuplex = true) {
+  println(F("AT+CIPMODE=1"));//进入透传模式
+  if (isDuplex) {
+    delay(250);
+    println(F("AT+CIPSEND"));//允许直接发送信息
+  }
+
+}
+
+
+String DevBoardESP8266::getIpAddress() {
+  char buffer[50];
+  println(F("AT+CIFSR"));
+  if (readLine(buffer, sizeof(buffer)))
+  {
+    debug->println(buffer);
+    find(); // Discard the 'OK' that follows
+  }
+  else
+  { // IP addr check failed
+    debug->println(F("error"));
+  }
+}

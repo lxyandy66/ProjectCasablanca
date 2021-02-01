@@ -22,6 +22,7 @@ typedef const PROGMEM char Pchr;        //!< Ditto, kindasorta
 class DevBoardESP8266 : public Print {
 public:
     DevBoardESP8266(Stream* s = &Serial, Stream* d = NULL, int8_t r = -1);
+    String getIpAddress();
     boolean hardReset(void), softReset(void), sendContent(Fstr* content), sendContent(String content), sendContentDirectly(String content),
         find(Fstr* str = NULL, boolean ipd = false),
         connectToAP(Fstr* ssid, Fstr* pass), connectToAP(Fstr* ssid, Fstr* pass, boolean needChangeMode), connectTCP(Fstr* host, int port),

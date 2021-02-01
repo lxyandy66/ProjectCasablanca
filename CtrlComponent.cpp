@@ -31,9 +31,9 @@ int CtrlComponent::threadBlinker(struct pt* pt) {
 int CtrlComponent::threadBlinkerOnce(struct pt* pt, int blinkDuration) {
 	//LED控制线程，用于不阻塞主线程时闪烁
 	PT_BEGIN(pt);
-	int starter = millis();
+	long starter = millis();
 	this->changeLed(true);
-	PT_WAIT_UNTIL(pt, millis() - starter > blinkDuration);//持续监听needBlink变量
+	PT_WAIT_UNTIL(pt, millis() - starter > blinkDuration);
 	this->changeLed(false);
 	// this->debugPrint("in the class, set led as off");
 	PT_END(pt);

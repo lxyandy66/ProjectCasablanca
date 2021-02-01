@@ -75,6 +75,9 @@
 		"iterator_base": "cpp",
 		"ostream_helpers": "cpp",
 		"memory_resource": "cpp",
-		"complex": "cpp"
+		"complex": "cpp",
+		"__functional_base_03": "cpp",
+		"chrono": "cpp",
+		"ratio": "cpp"
 	}
 }
