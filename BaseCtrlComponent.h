@@ -1,6 +1,7 @@
 
 #pragma once
 
+
 #include<Arduino.h>
 #include <string.h>
 #include <vector>
@@ -8,11 +9,12 @@
 #include <pt.h>
 #include <Chrono.h>
 #include <LightChrono.h>
+#include "AgentMsg.h"
 #include"AgentProtocol.h"
 
+//作为所有板子的基类，考虑与MAS无关，即所有日后的NCS
 
-
-class CtrlComponent {
+class BaseCtrlComponent {
 
 protected:
 	unsigned long pinLed;//LED不能少
@@ -21,14 +23,14 @@ protected:
 	String boardType;
 	long timeBuffer;
 	String strBuffer;
+
 	AgentMsg msgBuffer;
 	StaticJsonDocument<AgentProtocol::MSG_SIZE> jsonOut;//发送的buffer 64还不够
 	StaticJsonDocument<AgentProtocol::MSG_SIZE> jsonInputBuffer;//接收的buffer //继承的
 	StaticJsonDocument<AgentProtocol::DATA_SIZE> jsonData;//采集数据的buffer
 
 public:
-	CtrlComponent(String bdId, String bdType);
-	// ~CtrlComponent();
+	BaseCtrlComponent(String bdId, String bdType);
 	void setBoardId(String str);
 	String getBoardId();
 	void setBoardType(String str);
@@ -48,7 +50,7 @@ public:
 	void changeLed();
 
 
-	JsonDocument* getInputBuffer();
-	JsonDocument* getOutputBuffer();
-	JsonDocument* getDataBuffer();
+	virtual JsonDocument* getInputBuffer();
+	virtual JsonDocument* getOutputBuffer();
+	virtual JsonDocument* getDataBuffer();
 };

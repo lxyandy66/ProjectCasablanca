@@ -118,7 +118,7 @@
     <ClCompile Include="AgentProtocol.cpp" />
     <ClCompile Include="BaseBuffer.cpp" />
     <ClCompile Include="Coordinator.cpp" />
-    <ClCompile Include="CtrlComponent.cpp" />
+    <ClCompile Include="MasComponent.cpp" />
     <ClCompile Include="DevBoardESP8266.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -127,7 +127,7 @@
     <ClInclude Include="AgentProtocol.h" />
     <ClInclude Include="BaseBuffer.h" />
     <ClInclude Include="Coordinator.h" />
-    <ClInclude Include="CtrlComponent.h" />
+    <ClInclude Include="MasComponent.h" />
     <ClInclude Include="DevBoardESP8266.h" />
     <ClInclude Include="__vm\.StmCoordinator.vsarduino.h" />
   </ItemGroup>

@@ -4,22 +4,18 @@
 #include <pt.h>
 
 
-BaseAgent::BaseAgent(String bdId, String bdType) :CtrlComponent(bdId, bdType),reqId(-1),respId(0){}
+BaseAgent::BaseAgent(String bdId, String bdType) :BaseLocalWirelessClient(bdId, bdType),reqId(-1),respId(0){}
 
 
 CoordinatorBuffer BaseAgent::getCurrentBuffer() { return this->coBuffer; }
 
-void BaseAgent::setWifiModule(DevBoardESP8266 wifi) {
-	this->wifiModule = wifi;
-}
+
 void BaseAgent::sendMessage(String msg) {
 	// this->wifiModule.sendContent(msg);
 	this->sendOutput->println("Send: " + msg);//暂时先这样
 }
 
-void BaseAgent::setSendOutput(Stream* s) {
-	this->sendOutput = s;
-}
+
 
 void BaseAgent::debugPrint(String str) {
 	Serial.println("In debug: " + str);//仅用于debug

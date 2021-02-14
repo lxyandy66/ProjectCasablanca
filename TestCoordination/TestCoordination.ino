@@ -15,8 +15,8 @@
 #include <ArduinoJson.h>
 #include"../Coordinator.h"
 #include"../Coordinator.cpp"
-#include"../CtrlComponent.h"
-#include"../CtrlComponent.cpp"
+#include"../MasComponent.h"
+#include"../MasComponent.cpp"
 
 String boardId = "CoTest_1";
 Coordinator co(boardId);

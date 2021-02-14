@@ -6,7 +6,6 @@
 #include <pt.h>
 #include "AgentMsg.h"
 #include "AgentProtocol.h"
-#include "CtrlComponent.h"
 #include <Chrono.h>
 #include <LightChrono.h>
 #include<ArduinoJson.h>

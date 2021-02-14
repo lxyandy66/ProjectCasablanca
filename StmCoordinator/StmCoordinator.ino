@@ -16,16 +16,16 @@
 #include <ArduinoJson.h>
 #include"Coordinator.h"
 //#include<Coordinator.cpp>
-//#include"CtrlComponent.h"
-//#include"CtrlComponent.cpp"
+//#include"MasComponent.h"
+//#include"MasComponent.cpp"
 
 //#include"../Coordinator.cpp"
-//#include"../CtrlComponent.h"
-//#include"../CtrlComponent.cpp"
+//#include"../MasComponent.h"
+//#include"../MasComponent.cpp"
 //#include"../Coordinator.h"
 //#include"../Coordinator.cpp"
-//#include"../CtrlComponent.h"
-//#include"../CtrlComponent.cpp"
+//#include"../MasComponent.h"
+//#include"../MasComponent.cpp"
 
 #define PIN_OLED_SCL A4
 #define PIN_OLED_SDA A6 //MOSI

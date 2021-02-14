@@ -36,7 +36,7 @@
     <ClCompile Include="Coordinator.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="CtrlComponent.cpp">
+    <ClCompile Include="MasComponent.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="DevBoardESP8266.cpp">
@@ -59,7 +59,7 @@
     <ClInclude Include="Coordinator.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="CtrlComponent.h">
+    <ClInclude Include="MasComponent.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="DevBoardESP8266.h">

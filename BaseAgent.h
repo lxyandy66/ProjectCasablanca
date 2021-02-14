@@ -3,26 +3,21 @@
 #include<Arduino.h>
 #include <string.h>
 #include <vector>
-#include"CtrlComponent.h"
-#include"DevBoardESP8266.h"
+#include"BaseLocalWirelessClient.h"
 #include"AgentProtocol.h"
 #include"CoordinatorBuffer.h"
 
 
-class BaseAgent : public CtrlComponent {
+class BaseAgent : public BaseLocalWirelessClient {
 private:
-	DevBoardESP8266 wifiModule;
 	long reqId;
 	long respId;
 	CoordinatorBuffer coBuffer;
-	Stream* sendOutput;
 public:
 	BaseAgent(String bdId, String bdType);
 	// void parseMsg(String msg);//处理交互的数据
 	double compData();
 
-	void setSendOutput(Stream* s);
-	void setWifiModule(DevBoardESP8266 wifi);
 	void sendMessage(String msg);
 	void debugPrint(String str);
 
