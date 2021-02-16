@@ -30,6 +30,11 @@ class Coordinator : public BaseCtrlComponent {  //
     Coordinator(String bdId, String bdType);
     // Coordinator();
     // ~Coordinator();
+
+    //设定初始参数
+    void setEnvironmentParameter(double tWb);
+    void setParameter(double initLambda, boolean initConverge);
+
     boolean isConverge(double meanChiTemp, double meanCoolingTowerTemp);  //计算是否收敛
     double compLambda(double meanChiTemp, double meanCoolingTowerTemp);   //计算lamda值
 

@@ -75,8 +75,10 @@ String Coordinator::packCoordinatorData() {
     jsonOut[AgentProtocol::REQ_ID_FROM_JSON] = ++this->reqId;
     jsonOut[AgentProtocol::RESP_ID_FROM_JSON] = -1;  // AgentProtocol::RESP_ID_FROM_JSON
     if (!canStartCoordinateCaculate()) {
-        //如果不能直接返回一个随便的
-        jsonOut[AgentProtocol::DATA_FROM_JSON] = "{\"cv\":false,\"lm\":-1}";
+        //如果不能计算返回
+        jsonOut[AgentProtocol::DATA_FROM_JSON] =
+            "{\"cv\":" + String(this->localConverge ? "true" : "false") +  //为什么这么蠢
+            ",\"lm\":" + String(this->localLambda, 4) + "}";
         jsonOut[AgentProtocol::COMPUTE_TIME_FROM_JSON] = -1;
     } else {
         jsonOut[AgentProtocol::DATA_FROM_JSON] = coordinateCalculate();
@@ -203,4 +205,9 @@ boolean Coordinator::canStartCoordinateCaculate() {
         this->getListFromPoolByType(AgentProtocol::TYPE_COOLING_TOWER) == nullptr)
         return false;  //显然两者起码不能同时为空
     return true;
+}
+
+void Coordinator::setParameter(double initLambda, boolean initConverge) {
+    this->localLambda = initLambda;
+    this->localConverge = initConverge;
 }
