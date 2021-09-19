@@ -22,10 +22,7 @@ class BaseCtrlComponent {
     long timeBuffer;
     String strBuffer;
 
-    AgentMsg msgBuffer;                                           //日后其他NCS系统都可以通用该消息类
-    StaticJsonDocument<AgentProtocol::MSG_SIZE> jsonOut;          //发送的buffer
-    StaticJsonDocument<AgentProtocol::MSG_SIZE> jsonInputBuffer;  //接收的buffer
-    StaticJsonDocument<AgentProtocol::DATA_SIZE> jsonData;        //采集数据的buffer
+
 
    public:
     BaseCtrlComponent(String bdId, String bdType);
@@ -33,7 +30,6 @@ class BaseCtrlComponent {
     String getBoardId();
     void setBoardType(String str);
     String getBoardType();
-    virtual void sendMessage(String msg) = 0;
     virtual void debugPrint(String str) = 0;  //用于开发中debug的显示
 
     /*LED相关*/
@@ -47,7 +43,4 @@ class BaseCtrlComponent {
     void changeLed(boolean b);
     void changeLed();
 
-    virtual JsonDocument* getInputBuffer();
-    virtual JsonDocument* getOutputBuffer();
-    virtual JsonDocument* getDataBuffer();
 };

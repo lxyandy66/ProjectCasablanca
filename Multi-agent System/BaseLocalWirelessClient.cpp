@@ -2,7 +2,7 @@
 #include "BaseLocalWirelessClient.h"
 
 
-BaseLocalWirelessClient::BaseLocalWirelessClient(String bdId, String bdType) :BaseCtrlComponent(bdId, bdType) {}
+BaseLocalWirelessClient::BaseLocalWirelessClient(String bdId, String bdType) :BaseNetworkCtrlComponent(bdId, bdType) {}
 
 void BaseLocalWirelessClient::setWifiModule(DevBoardESP8266 wifi) {
 	this->wifiModule = wifi;

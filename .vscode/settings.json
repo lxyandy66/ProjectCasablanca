@@ -78,6 +78,9 @@
 		"complex": "cpp",
 		"__functional_base_03": "cpp",
 		"chrono": "cpp",
-		"ratio": "cpp"
-	}
+		"ratio": "cpp",
+		"C_Cpp.clang_format_style": "{ BasedOnStyle: Chromium, IndentWidth: 4}",
+		"__memory": "cpp"
+	},
+	"C_Cpp.clang_format_style": "{ BasedOnStyle: Chromium, IndentWidth: 4}"
 }

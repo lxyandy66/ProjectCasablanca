@@ -17,7 +17,7 @@
 
 // Coordinator类
 
-Coordinator::Coordinator(String bdId, String bdType) : BaseCtrlComponent(bdId, bdType) {
+Coordinator::Coordinator(String bdId, String bdType) : BaseNetworkCtrlComponent(bdId, bdType) {
     //本地缓存值初始化
     this->localLambda = -1;  // lambda本地缓存
     this->localConverge = false;

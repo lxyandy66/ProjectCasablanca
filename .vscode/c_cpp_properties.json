@@ -3,15 +3,14 @@
         {
             "name": "Mac",
             "includePath": [
-                "/Users/Mr_Li/Library/Arduino15/packages/AZ3166/tools/**",
-                "/Users/Mr_Li/Library/Arduino15/packages/AZ3166/hardware/stm32f4/2.0.0/**",
                 "/Users/Mr_Li/Documents/Arduino/libraries/Adafruit_Unified_Sensor",
                 "/Users/Mr_Li/Documents/Arduino/libraries/DHT_sensor_library",
                 "/Users/Mr_Li/Documents/Arduino/libraries/U8g2/src",
-                "/Users/Mr_Li/Library/Arduino15/packages/STM32/tools/**",
-                "/Users/Mr_Li/Library/Arduino15/packages/STM32/hardware/stm32/1.9.0/**",
+                "/Users/Mr_Li/Library/Arduino15/packages/STMicroelectronics/tools/**",
+                "/Users/Mr_Li/Library/Arduino15/packages/STMicroelectronics/hardware/stm32/2.0.0/**",
                 "/Applications/Arduino.app/Contents/Java/libraries/**",
-                "/Users/Mr_Li/Documents/Arduino/libraries/**"
+                "/Users/Mr_Li/Documents/Arduino/libraries/**",
+                "${workspaceFolder}"
             ],
             "forcedInclude": [
                 "/Users/Mr_Li/Library/Arduino15/packages/STM32/hardware/stm32/1.9.0/cores/arduino/Arduino.h"

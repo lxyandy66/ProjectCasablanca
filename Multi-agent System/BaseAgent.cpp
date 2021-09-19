@@ -52,7 +52,7 @@ void BaseAgent::setParameter() {}
 void BaseAgent::setEnvironmentParameter(double wb) {}
 
 boolean BaseAgent::addToBuffer(CoordinatorBuffer cb) {
-    //对新解析的buffer进行处理，通过返回值判断是否需要进行计算并发送
+    //对新解析的buffer进  行处理，通过返回值判断是否需要进行计算并发送
 
     //逻辑需要考虑，尤其是出现延迟的处理，即ReqId滞后或重传的处理（暂时直接丢弃
 
@@ -65,7 +65,7 @@ boolean BaseAgent::addToBuffer(CoordinatorBuffer cb) {
         this->coBuffer = cb;
         this->reqId = cb.getReqId();
         this->respId++;
-        return true;
+        return false;
     }
     //执行到此表明收到新的信息，且没有收敛
     this->coBuffer = cb;

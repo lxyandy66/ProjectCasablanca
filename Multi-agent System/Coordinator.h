@@ -10,9 +10,9 @@
 #include "AgentBuffer.h"
 #include "AgentMsg.h"
 #include "AgentProtocol.h"
-#include "BaseCtrlComponent.h"
+#include "BaseNetworkCtrlComponent.h"
 
-class Coordinator : public BaseCtrlComponent {  //
+class Coordinator : public BaseNetworkCtrlComponent {  //
    private:
     // String boardId; //继承的
     Chrono optChrono;   //节拍器,coordinator用

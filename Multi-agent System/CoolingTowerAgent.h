@@ -21,14 +21,14 @@ class CoolingTowerAgent : public BaseAgent {
         this->tWaterCtIn = tcwin;
         this->tWaterCon = tcon;
         this->isOn = on;
-        setCtModelPara();
+        setCtModelPara(4.6254, 1.0281, 0.0902, 1.0925);  //默认一个缺省的
     }
 
-    void setCtModelPara() {
-        this->a1 = 4.6254;
-        this->a2 = 1.0281;
-        this->a3 = -0.0902;
-        this->a4 = 1.0925;  // a1~a4:冷却塔模型参数
+    void setCtModelPara(double a1, double a2, double a3, double a4) {
+        this->a1 = a1;
+        this->a2 = a2;
+        this->a3 = a3;
+        this->a4 = a4;  // a1~a4:冷却塔模型参数
     }
 
     double compTemp() {

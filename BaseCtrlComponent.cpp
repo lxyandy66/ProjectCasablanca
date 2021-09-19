@@ -62,7 +62,3 @@ void BaseCtrlComponent::setLedPin(unsigned long p) {
 	this->pinLed = p;
 }
 unsigned long BaseCtrlComponent::getLedPin() { return this->pinLed; }
-
-JsonDocument* BaseCtrlComponent::getInputBuffer() { return &(this->jsonInputBuffer); }
-JsonDocument* BaseCtrlComponent::getOutputBuffer() { return &(this->jsonOut); }
-JsonDocument* BaseCtrlComponent::getDataBuffer() { return &(this->jsonData); }

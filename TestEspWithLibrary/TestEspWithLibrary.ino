@@ -97,7 +97,7 @@ void setup() {
     wifi.setTransparentMode(true);
     // Agent类型和参数设定
     // agent = AgentFactory::createAgent(AgentType::CHILLER, "CH_1");
-    agent = AgentFactory::createAgent(AgentType::COOLING_TOWER, "CT_2");
+    agent = AgentFactory::createAgent(AgentType::COOLING_TOWER, "CT_1");
 
     agent->setEnvironmentParameter(14.39);
 
@@ -106,6 +106,8 @@ void setup() {
 
     // Cooling tower:(double tcwin, double tcon, boolean on)
     ((CoolingTowerAgent*)agent)->setParameter(25, 20.93, true);
+    ((CoolingTowerAgent*)agent)->setCtModelPara(4.6254, 1.0281, 0.0902, 1.0925);  // CT_1
+    // ((CoolingTowerAgent*)agent)->setCtModelPara(4.4419, 1.0343, -0.1027, 1.0945);  // CT_2
 
     agent->setWifiModule(wifi);
     agent->setSendOutput(&Serial1);
