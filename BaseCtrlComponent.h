@@ -8,8 +8,6 @@
 #include <pt.h>
 #include <string.h>
 #include <vector>
-#include "AgentMsg.h"
-#include "AgentProtocol.h"
 
 //作为所有板子的基类，考虑与MAS无关，即所有日后的NCS
 
