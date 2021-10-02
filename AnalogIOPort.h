@@ -13,7 +13,7 @@ class AnalogIOPort {
     double lower;
     double upper;   //实际使用的最大值
     
-    double limitRange(double value,double lower,double upper);//将输入值限制在范围内
+    virtual double limitRange(double value,double lower,double upper);//将输入值限制在范围内，子类可自定义
     void setRange();
 
    public:
@@ -29,6 +29,8 @@ class AnalogIOPort {
     double getLower();
     void setLower(double low);
     
+    virtual double mappingValue(double originalValue);//映射关系函数，按照预定关系处理
+
     ///DAC设定，仅支持设定DAC位数，自动决定输出最大值
     int getMaxValue();
     void setResolutionBit(int res);

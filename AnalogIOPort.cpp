@@ -57,3 +57,9 @@ double AnalogIOPort::getLower() {
 void AnalogIOPort::setLower(double low) {
     this->lower = low > 0 ? low : 0;
 }
+
+
+double AnalogIOPort::mappingValue(double originalValue){
+    //默认按百分比输出
+    return (originalValue - this->lower) / (this->upper - this->lower);
+}
