@@ -1,12 +1,16 @@
 #pragma once
 #include "AnalogReader.h"
 
-AnalogReader::AnalogReader(int port, int res=8):AnalogIOPort(port,res){
-    movCacu=NumericMovingAverageCaculator(7);
+
+
+AnalogReader::AnalogReader(int port, int res,int smoothSize):AnalogIOPort(port,res){
+    movCacu=NumericMovingAverageFilter(smoothSize);
     pinMode(port, INPUT_ANALOG);
 }
 
-void setSmoothWindowSize(int size);
+void AnalogReader::setSmoothWindowSize(int size){
+    this->movCacu.setWindowSize(size);
+}
 
 double AnalogReader::readAnalogTool(){
     //直接跟IO交互的函数
@@ -16,20 +20,24 @@ double AnalogReader::readAnalogTool(){
     return value;
 }
 
+void AnalogReader::updatedReadAnalog(){
+    readAnalogTool();
+}
+
 //除了直接读取外，默认均不与IO口进行交互，仅通过队列处理
-double AnalogReader:: readAnalogByMapping(boolean needUpdated=false){//读取模拟输出至百分比
+double AnalogReader:: readAnalogByMapping(boolean needUpdated){//读取模拟输出至百分比
     if(needUpdated)
         readAnalogTool();
     return mappingValue(this->movCacu.getNewestElement());
 }
 
-double AnalogReader:: readAnalogDirectly(boolean needUpdated=false){//读取模拟输出至百分比
+double AnalogReader:: readAnalogDirectly(boolean needUpdated){//读取模拟输出至百分比
     if(needUpdated)
         readAnalogTool();
     return this->movCacu.getNewestElement();
 }
 
-double AnalogReader::readAnalogSmoothly(boolean needUpdated=false,boolean needMapping=false){
+double AnalogReader::readAnalogSmoothly(boolean needUpdated,boolean needMapping){
     if(needUpdated)
         readAnalogTool();
     return needMapping?mappingValue(this->movCacu.getAverage()):this->movCacu.getAverage();

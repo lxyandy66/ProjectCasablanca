@@ -1,6 +1,8 @@
 #pragma once
 #include "AnalogWriter.h"
 
+AnalogWriter::AnalogWriter(int port, int res):AnalogIOPort(port,res){}
+
 void AnalogWriter:: outputAnalogTool(double limitedValue) {
     // 最终执行模拟量输出的函数，确保传入的值已经是合法值
     analogWrite(this->portNo, limitedValue);

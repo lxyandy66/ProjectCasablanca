@@ -2,7 +2,7 @@
 #include <queue>
 
 template <class T,class N>  // T 为每个元素的模版类，N为统计的模版类，例如，T可为AgentBuffer，N可为double
-class MovingAverageCaculator {
+class MovingAverageFilter {
     //滑动平均值计算器，维护一个数据储存队列
     //作为基类，保留追加、计算、更新接口用于子类
     protected:
@@ -11,7 +11,7 @@ class MovingAverageCaculator {
     int windowSize;  //滑窗大小，决定队列容量
 
    public:
-    MovingAverageCaculator(int size=7) :windowSize(size){}
+    MovingAverageFilter(int size=7) :windowSize(size){}
     N append(T ele) {
         smoothQueue.push(ele);
         if (smoothQueue.size() > windowSize) {
@@ -32,9 +32,9 @@ class MovingAverageCaculator {
     
 };
 
-class NumericMovingAverageCaculator: public MovingAverageCaculator<double, double> {
+class NumericMovingAverageFilter: public MovingAverageFilter<double, double> {
     public:
-    NumericMovingAverageCaculator(int size=7):MovingAverageCaculator(size){}
+    NumericMovingAverageFilter(int size=7):MovingAverageFilter(size){}
     
     void updateSum(double appendEle, double deleteEle) {
         this->sum = this->sum + appendEle - deleteEle;
