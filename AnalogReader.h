@@ -3,9 +3,10 @@
 #include "MovingAverageFilter.h"
 
 class AnalogReader : public AnalogIOPort {
-   private:
+   protected:
     NumericMovingAverageFilter movCacu;   //选7步移动平均
-    double readAnalogTool();  //实际读取模拟量的函数
+    virtual double readAnalogTool();  //实际读取模拟量的函数
+
 
    public:
     AnalogReader(int port,int res,int smoothSize=7);
@@ -17,4 +18,5 @@ class AnalogReader : public AnalogIOPort {
     double readAnalogSmoothly(boolean needUpdated=false, boolean needMapping=false);
 
     void setSmoothWindowSize(int size);
+
 };
