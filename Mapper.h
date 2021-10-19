@@ -12,6 +12,18 @@ class Mapper {
         parameter = new double[o + 1];
     }
 
+    // 直接对多项式参数进行初始化的方法，但不对传入参数合法性进行检查
+    Mapper(int o,double* p) {
+        if (o < 1)
+            o = 1;
+        this->order = o;
+        parameter = new double[o + 1];
+        //不对传入的p进行检查
+        for (int i = 0; i < o + 1;i++){
+            parameter[i] = p[i];
+        }
+    }
+
     //设为虚函数，可被重载为其他映射关系
     virtual double mapping(double input) {
         double result = 0;
