@@ -14,7 +14,7 @@
 
 //作为所有MAS中Agent的基类，包含网络控制相关应用
 
-class BaseNetworkCtrlComponent: public BaseCtrlComponent {
+class BaseNetworkCtrlComponent: public BaseLocalWirelessClient {
    protected:
 
     AgentMsg msgBuffer;                                           //日后其他NCS系统都可以通用该消息类

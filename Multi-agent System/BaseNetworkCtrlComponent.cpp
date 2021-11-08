@@ -1,7 +1,7 @@
 #pragma once
 #include"BaseNetworkCtrlComponent.h"
 
-BaseNetworkCtrlComponent::BaseNetworkCtrlComponent(String bdId, String bdType) :BaseCtrlComponent(bdId,bdType){}
+BaseNetworkCtrlComponent::BaseNetworkCtrlComponent(String bdId, String bdType) :BaseLocalWirelessClient(bdId,bdType){}
 
 // BaseNetworkCtrlComponent::~BaseNetworkCtrlComponent() {}
 

@@ -12,7 +12,7 @@
 #include "AgentProtocol.h"
 #include "BaseNetworkCtrlComponent.h"
 
-class Coordinator : public BaseNetworkCtrlComponent {  //
+class Coordinator : public BaseCtrlComponent {  //
    private:
     // String boardId; //继承的
     Chrono optChrono;   //节拍器,coordinator用

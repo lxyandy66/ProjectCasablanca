@@ -7,7 +7,7 @@
 #include "BaseLocalWirelessClient.h"
 #include "CoordinatorBuffer.h"
 
-class BaseAgent : public BaseLocalWirelessClient {
+class BaseAgent : public BaseNetworkCtrlComponent {
    private:
     long reqId;
     long respId;

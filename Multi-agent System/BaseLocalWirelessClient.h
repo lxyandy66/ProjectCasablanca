@@ -4,7 +4,7 @@
 #include "BaseNetworkCtrlComponent.h"
 
 
-class BaseLocalWirelessClient : public BaseNetworkCtrlComponent {
+class BaseLocalWirelessClient : public BaseCtrlComponent {
 protected:
 	DevBoardESP8266 wifiModule;
 	Stream* sendOutput;
