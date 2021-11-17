@@ -1,11 +1,17 @@
+#pragma once
+#include <ArduinoJson.h>
+#include "AgentProtocol.h"
+
 class Mapper {
     //多项式类，可设置自动更新
    private:
+    String mapperName;
     double* parameter;
     int order;
 
    public:
-    Mapper(int o) {
+    Mapper(int o,String n) {
+        this->mapperName = n;
         if (o < 1)
             o = 1;
         this->order = o;
@@ -13,7 +19,8 @@ class Mapper {
     }
 
     // 直接对多项式参数进行初始化的方法，但不对传入参数合法性进行检查
-    Mapper(int o,double* p) {
+    Mapper(int o,double* p,String n) {
+        this->mapperName = n;
         if (o < 1)
             o = 1;
         this->order = o;
@@ -24,8 +31,11 @@ class Mapper {
         }
     }
 
+    void setMapperName(String n) { this->mapperName = n; }
+    String getMapperName() { return this->mapperName; }
+
     //设为虚函数，可被重载为其他映射关系
-    virtual double mapping(double input) {
+    double mapping(double input) {
         double result = 0;
         double multiple = 1;
         for (int i = 0; i < (order + 1); i++) {
@@ -50,6 +60,22 @@ class Mapper {
         for (int i = 0; i < (order + 1); i++) {
             parameter[i] = para[i];
         }
+    }
+
+    //用于通过通讯的json字符串设置参数
+    boolean setParameter(String jsonStr){
+        //JSON解析
+        Serial.println(jsonStr);
+        DynamicJsonDocument jsonBuffer(AgentProtocol::MSG_SIZE);
+        DeserializationError t = deserializeJson(jsonBuffer, jsonStr);
+        if (t) {
+            return false;
+        }
+        //检测指令类型
+        //默认为二次函数，k，b
+        parameter[0]=jsonBuffer["k"].as<double>();
+        parameter[1]=jsonBuffer["b"].as<double>();
+        return true;
     }
 
     void showParameter() {
