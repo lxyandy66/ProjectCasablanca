@@ -9,4 +9,6 @@ class AnalogWriter : public AnalogIOPort {
      AnalogWriter(int port, int res);
      void outputAnalogByMapping(double outputValue);  //直接按照百分比输出，具体输出值由内部函数确定
      void outputAnalogDirectly(double outputValue,boolean withLimit=true);  //直接按值，并且由输出最大值限定
+
+     virtual double mappingValue(double originalValue);
 };

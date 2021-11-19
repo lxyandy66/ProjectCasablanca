@@ -42,3 +42,7 @@ double AnalogReader::readAnalogSmoothly(boolean needUpdated,boolean needMapping)
         readAnalogTool();
     return needMapping?mappingValue(this->movCacu.getAverage()):this->movCacu.getAverage();
 }
+
+double AnalogReader::mappingValue(double originalValue){
+    return this->mapper->mapping(originalValue);
+}

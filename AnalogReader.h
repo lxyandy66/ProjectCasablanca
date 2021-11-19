@@ -19,4 +19,5 @@ class AnalogReader : public AnalogIOPort {
 
     void setSmoothWindowSize(int size);
 
+    double mappingValue(double originalValue);
 };

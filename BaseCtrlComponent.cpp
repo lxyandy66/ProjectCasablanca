@@ -62,3 +62,7 @@ void BaseCtrlComponent::setLedPin(unsigned long p) {
 	this->pinLed = p;
 }
 unsigned long BaseCtrlComponent::getLedPin() { return this->pinLed; }
+
+void BaseCtrlComponent::sendMessage(String msg){
+    Serial.println(msg);
+}

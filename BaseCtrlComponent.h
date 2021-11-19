@@ -28,7 +28,8 @@ class BaseCtrlComponent {
     String getBoardId();
     void setBoardType(String str);
     String getBoardType();
-    virtual void debugPrint(String str) = 0;  //用于开发中debug的显示
+    virtual void debugPrint(String str);  //用于开发中debug的显示
+    virtual void sendMessage(String str);
 
     /*LED相关*/
     int threadBlinker(struct pt* pt);                               // blinker线程,通过needBlink异步控制LED

@@ -1,5 +1,6 @@
 #pragma once
 #include <Arduino.h>
+#include "Mapper.h"
 
 class AnalogIOPort {
 //作为整个模拟量IO的基类，提供模拟量的分辨率限制，映射等
@@ -12,7 +13,9 @@ class AnalogIOPort {
     
     double lower;
     double upper;   //实际使用的最大值
-    
+
+    Mapper* mapper;
+
     virtual double limitRange(double value,double lower,double upper);//将输入值限制在范围内，子类可自定义
     void setRange();
 
@@ -28,7 +31,8 @@ class AnalogIOPort {
     void setUpper(double up);
     double getLower();
     void setLower(double low);
-    
+    void setMapper(Mapper* mp);
+
     virtual double mappingValue(double originalValue);//映射关系函数，按照预定关系处理
 
     ///DAC设定，仅支持设定DAC位数，自动决定输出最大值

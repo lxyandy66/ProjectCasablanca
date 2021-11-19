@@ -15,7 +15,9 @@ void AnalogWriter::outputAnalogByMapping(double outputValue) {//直接按照映�
     // outputAnalogTool(mappingValue(outputValue));
 }
 
-
+double AnalogWriter::mappingValue(double originalValue){
+    return this->mapper->mapping(originalValue);
+}
 
 void AnalogWriter::outputAnalogDirectly(double outputValue,boolean withLimit){//直接按值，并且由输出最大值限定
     outputAnalogTool(withLimit ? limitRange(outputValue, this->getLower(),this->getUpper()): outputValue);
