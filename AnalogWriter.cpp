@@ -9,9 +9,9 @@ void AnalogWriter:: outputAnalogTool(double limitedValue) {
 }
 
 void AnalogWriter::outputAnalogByMapping(double outputValue) {//直接按照映射关系输出，具体输出值由内部函数确定
-    double actualOut = mappingValue(outputValue);
+    this->actualOutputValue = mappingValue(outputValue);
     // Serial.println("Actual outSet: "+String(actualOut));
-    outputAnalogTool(actualOut);
+    outputAnalogTool(actualOutputValue);
     // outputAnalogTool(mappingValue(outputValue));
 }
 
@@ -20,5 +20,8 @@ double AnalogWriter::mappingValue(double originalValue){
 }
 
 void AnalogWriter::outputAnalogDirectly(double outputValue,boolean withLimit){//直接按值，并且由输出最大值限定
-    outputAnalogTool(withLimit ? limitRange(outputValue, this->getLower(),this->getUpper()): outputValue);
+    this->actualOutputValue = withLimit ? limitRange(outputValue, this->getLower(), this->getUpper()) : outputValue;
+    outputAnalogTool(actualOutputValue);
 }
+
+double AnalogWriter::getOutputValve(){ return this->actualOutputValue; }

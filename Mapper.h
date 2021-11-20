@@ -1,24 +1,24 @@
 #pragma once
 #include <ArduinoJson.h>
 #include "AgentProtocol.h"
+#include "CtrlAccessory.h"
 
-class Mapper {
+class Mapper :public CtrlAccessory{
     //多项式类，可设置自动更新
    private:
-    String mapperId;
     double* parameter;
     int order;
 
    public:
     Mapper() {
         //默认无参则直接输出
-        this->mapperId = "M_DEF";
+        this->id = "M_DEF";
         this->order = 0;
         parameter = new double[1]{1};
     }
     
     Mapper(int o, String n) {
-        this->mapperId = n;
+        this->id = n;
         if (o < 1)
             o = 1;
         this->order = o;
@@ -27,7 +27,7 @@ class Mapper {
 
     // 直接对多项式参数进行初始化的方法，但不对传入参数合法性进行检查
     Mapper(int o, double* p, String n) {
-        this->mapperId = n;
+        this->id = n;
         if (o < 1)
             o = 1;
         this->order = o;
@@ -38,8 +38,6 @@ class Mapper {
         }
     }
 
-    void setMapperId(String n) { this->mapperId = n; }
-    String getMapperId() { return this->mapperId; }
 
     //设为虚函数，可被重载为其他映射关系
     double mapping(double input) {
@@ -85,7 +83,7 @@ class Mapper {
         return true;
     }
 
-    void showParameter() {
+    void showParameters() {
         for (int i = 0; i < (order + 1); i++) {
             Serial.println(parameter[i]);
         }

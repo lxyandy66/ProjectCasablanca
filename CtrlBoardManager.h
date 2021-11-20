@@ -27,6 +27,12 @@ class CtrlBoardManager {
 
     static const char* CTRL_SETPOINT_DATA;
 
+    static const char* MGR_STATUS;
+
+    static const char* TUNING_KP;
+    static const char* TUNING_TI;
+    static const char* TUNING_TD;
+
     CtrlBoardManager();
 
     void addMapper(Mapper* mp);
@@ -42,6 +48,8 @@ class CtrlBoardManager {
     
     virtual void debugPrint(String str);
     double mappingValue(double originalValue, String mapperId);
+
+    double getSetpointById(String controllerId);
 
     void showStatus();
 };
