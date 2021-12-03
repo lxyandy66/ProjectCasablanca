@@ -12,9 +12,6 @@ const char* CtrlBoardManager::CTRL_SETPOINT_DATA = "sp";
 
 const char* CtrlBoardManager::MGR_STATUS = "STS";
 
-const char* CtrlBoardManager::TUNING_KP = "kp";
-const char* CtrlBoardManager::TUNING_TI = "ti";
-const char* CtrlBoardManager::TUNING_TD = "td";
 
 CtrlBoardManager::CtrlBoardManager() {}
 
@@ -28,7 +25,7 @@ void CtrlBoardManager::addController(PackedPID* controller){
 
 Mapper* CtrlBoardManager::findMapperById(String str) {
     for (int i = 0; i < mapperContainer.size(); i++) {
-        if (mapperContainer[i]->getId() == str)
+        if (mapperContainer[i]->getAcId() == str)
             return mapperContainer[i];
     }
     return nullptr;
@@ -36,7 +33,7 @@ Mapper* CtrlBoardManager::findMapperById(String str) {
 
 PackedPID* CtrlBoardManager::findControllerById(String str) {
     for (int i = 0; i < controllerContainer.size(); i++) {
-        if (controllerContainer[i]->getId() == str)
+        if (controllerContainer[i]->getAcId() == str)
             return controllerContainer[i];
     }
     return nullptr;
@@ -44,10 +41,9 @@ PackedPID* CtrlBoardManager::findControllerById(String str) {
 
 void CtrlBoardManager::commandDistributor(String str) {
     // 检测收到命令的类型，例如CMD+***，即检测前面CMD，并分配至相应的处理方法
-    // 例如{cmd:"MAP",mpn:"Flowrate",dt:{k:2,b:1}}
+    // 例如{cmd:"MAP",id:"Flowrate",dt:{k:2,b:1}}
 
     // JSON解析
-    Serial.println(str);
     DynamicJsonDocument jsonBuffer(AgentProtocol::MSG_SIZE);
     DeserializationError t = deserializeJson(jsonBuffer, str);
     if (t) {
@@ -60,7 +56,7 @@ void CtrlBoardManager::commandDistributor(String str) {
     //根据指令类型分配
     if (cmdType == CtrlBoardManager::MAPPING_OPEARTION) {
         //读取到为映射器修改指令
-        // 例如{cmd:"MAP",mpn:"Flowrate",dt:{k:2,b:1}}
+        // 例如{cmd:"MAP",id:"Flowrate",dt:{k:2,b:1}}
         //mapper的参数可能会变化，即不一定是k,b，所以直接传dt进去好了
         // showStatus();
         Mapper* changedMapper = findMapperById(jsonBuffer[CtrlBoardManager::COMP_ID].as<String>());
@@ -81,17 +77,14 @@ void CtrlBoardManager::commandDistributor(String str) {
         }
         changedController->setSetpoint(jsonBuffer[CtrlBoardManager::CTRL_SETPOINT_DATA].as<double>());
     } else if(cmdType == CtrlBoardManager::CTRL_TUNING){
-        // 例如{cmd:"CT_TN",id:"C_FR",kp:2.0,ti:2.0,td:2.0}
-        // PID控制器的参数反正是固定的，可以直接解析传入
+        // 例如{cmd:"CT_TN",id:"C_FR",dt:{kp:2.0,ti:2.0,td:2.0}}
+        // 
         PackedPID* changedController=findControllerById(jsonBuffer[CtrlBoardManager::COMP_ID].as<String>());
         if(changedController == NULL || changedController == nullptr){
             debugPrint("Controller not found according to: " + jsonBuffer[CtrlBoardManager::COMP_ID].as<String>());
             return;
         }
-        changedController->tuningParameter(
-            jsonBuffer[CtrlBoardManager::TUNING_KP].as<double>(),
-            jsonBuffer[CtrlBoardManager::TUNING_TI].as<double>(),
-            jsonBuffer[CtrlBoardManager::TUNING_TD].as<double>());
+        changedController->tuningParameter(jsonBuffer[AgentProtocol::DATA_FROM_JSON].as<String>());
     } else if(cmdType==CtrlBoardManager::MGR_STATUS){
         // 例如{cmd:"STS"}
         this->showStatus();
@@ -135,18 +128,18 @@ double CtrlBoardManager::mappingValue(double originalValue, String mapperId) {
 
 void CtrlBoardManager::showStatus(){
     for (int i = 0; i < mapperContainer.size();i++){
-        Serial.println("Mapper id: " + mapperContainer[i]->getId() );
+        Serial.println("Mapper id: " + mapperContainer[i]->getAcId() );
         mapperContainer[i]->showParameters();
     }
     for (int i = 0; i < controllerContainer.size();i++){
-        Serial.println("Controller id: " + controllerContainer[i]->getId() );
+        Serial.println("Controller id: " + controllerContainer[i]->getAcId() );
         controllerContainer[i]->showParameters();
     }
 }
 
 double CtrlBoardManager::getSetpointById(String controllerId){
     for (int i = 0; i < controllerContainer.size();i++){
-        if(controllerContainer[i]->getId()==controllerId)
+        if(controllerContainer[i]->getAcId()==controllerId)
             return controllerContainer[i]->getSetpoint();
     }
     return -999;

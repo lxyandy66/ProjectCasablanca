@@ -4,12 +4,13 @@ class CtrlAccessory {
     //作为所有控制辅助模块的基类
 
     protected:
-     String id;
+     String acId;
 
      public:
-      CtrlAccessory() { this->id = "X_DEF"; }
-      String getId() { return this->id; }
-      void setId(String str) { this->id = str; }
+      CtrlAccessory() { this->acId = "X_DEF"; }
+      CtrlAccessory(String id) { this->acId = id; }
+      String getAcId() { return this->acId; }
+      void setAcId(String str) { this->acId = str; }
 
       virtual void showParameters() = 0;
 

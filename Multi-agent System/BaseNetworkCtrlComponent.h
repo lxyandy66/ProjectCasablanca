@@ -24,7 +24,7 @@ class BaseNetworkCtrlComponent: public BaseLocalWirelessClient {
 
    public:
     BaseNetworkCtrlComponent(String bdId, String bdType);
-    virtual void sendMessage(String msg) = 0;
+    virtual void sendMessage(String msg);
 
 
     virtual JsonDocument* getInputBuffer();

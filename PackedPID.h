@@ -16,19 +16,20 @@ class PackedPID: public CtrlAccessory {
 
     public:
     PID pidController; //公有好了，外部方便更新
+    static const char* TUNING_KP;
+    static const char* TUNING_TI;
+    static const char* TUNING_TD;
 
-    //默认不调参则PID为1,0,0
-    PackedPID(AnalogReader* inPort, AnalogWriter* outPort, double initSetpoint,int ControllerDirection)
-        : inputPort(inPort), outputPort(outPort), setPoint(initSetpoint),
-        pidController(&(this->ctrlInput), &(this->ctrlOutput), &(this->setPoint), 1, 0, 0,ControllerDirection) {
-        id="C_DEF";
-        isCtrlByMapping = true;
+//默认不调参则PID为1,0,0
+PackedPID(AnalogReader* inPort,AnalogWriter* outPort,double initSetpoint,int ControllerDirection)
+: CtrlAccessory("C_DEF"),inputPort(inPort),outputPort(outPort),setPoint(initSetpoint),
+pidController(&(this->ctrlInput),&(this->ctrlOutput),&(this->setPoint),1,0,0,ControllerDirection) {
+    isCtrlByMapping = true;
     }
 
     PackedPID(AnalogReader* inPort, AnalogWriter* outPort, double initSetpoint,double kp, double ki, double kd,int ControllerDirection)
-        : inputPort(inPort), outputPort(outPort), setPoint(initSetpoint), 
+        : CtrlAccessory("C_DEF"),inputPort(inPort), outputPort(outPort), setPoint(initSetpoint), 
         pidController(&(this->ctrlInput), &(this->ctrlOutput), &(this->setPoint), kp, ki, kd,ControllerDirection){
-        id="C_DEF";
         isCtrlByMapping = true;
     }
 
@@ -61,6 +62,23 @@ class PackedPID: public CtrlAccessory {
 
     void tuningParameter(double k,double i,double d){
         pidController.SetTunings(k, i, d);
+    }
+
+
+    boolean tuningParameter(String jsonStr) {
+        // JSON解析
+        Serial.println(jsonStr);
+        DynamicJsonDocument jsonBuffer(AgentProtocol::MSG_SIZE);
+        DeserializationError t = deserializeJson(jsonBuffer, jsonStr);
+        if (t) {
+            return false;
+        }
+        //检测指令类型
+        //默认为二次函数，k，b
+        pidController.SetTunings(jsonBuffer[TUNING_KP].as<double>(),
+                                 jsonBuffer[TUNING_TI].as<double>(),
+                                 jsonBuffer[TUNING_TD].as<double>());
+        return true;
     }
 };
 

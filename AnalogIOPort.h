@@ -33,7 +33,7 @@ class AnalogIOPort {
     void setLower(double low);
     void setMapper(Mapper* mp);
 
-    virtual double mappingValue(double originalValue);//映射关系函数，按照预定关系处理
+    virtual double mappingValue(double originalValue,boolean needLimit);//映射关系函数，按照预定关系处理
 
     ///DAC设定，仅支持设定DAC位数，自动决定输出最大值
     int getMaxValue();

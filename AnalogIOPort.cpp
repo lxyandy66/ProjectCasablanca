@@ -62,7 +62,7 @@ void AnalogIOPort::setMapper(Mapper* mp){
     this->mapper = mp;
 }
 
-double AnalogIOPort::mappingValue(double originalValue){
+double AnalogIOPort::mappingValue(double originalValue,boolean needLimit){
     //默认按百分比输出
     return (originalValue - this->lower) / (this->upper - this->lower);
 }

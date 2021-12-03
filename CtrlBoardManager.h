@@ -29,9 +29,7 @@ class CtrlBoardManager {
 
     static const char* MGR_STATUS;
 
-    static const char* TUNING_KP;
-    static const char* TUNING_TI;
-    static const char* TUNING_TD;
+
 
     CtrlBoardManager();
 

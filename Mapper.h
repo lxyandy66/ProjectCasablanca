@@ -8,26 +8,29 @@ class Mapper :public CtrlAccessory{
    private:
     double* parameter;
     int order;
+    double lowLim;
+    double upperLim;
 
    public:
-    Mapper() {
+    Mapper():CtrlAccessory("M_DEF") {
         //默认无参则直接输出
-        this->id = "M_DEF";
         this->order = 0;
         parameter = new double[1]{1};
+        this->lowLim = 0;
+        this->upperLim = 4095;
     }
-    
-    Mapper(int o, String n) {
-        this->id = n;
+
+    Mapper(int o, String n): CtrlAccessory(n){
         if (o < 1)
             o = 1;
         this->order = o;
         parameter = new double[o + 1];
+        this->lowLim = 0;
+        this->upperLim = 4095;
     }
 
     // 直接对多项式参数进行初始化的方法，但不对传入参数合法性进行检查
-    Mapper(int o, double* p, String n) {
-        this->id = n;
+    Mapper(int o, double* p, String n): CtrlAccessory(n) {
         if (o < 1)
             o = 1;
         this->order = o;
@@ -36,11 +39,26 @@ class Mapper :public CtrlAccessory{
         for (int i = 0; i < o + 1; i++) {
             parameter[i] = p[i];
         }
+        this->lowLim = 0;
+        this->upperLim = 4095;
+    }
+    // 直接对多项式参数进行初始化的方法，但不对传入参数合法性进行检查
+    Mapper(int o, double* p, String n,double lLim,double uLim): CtrlAccessory(n) {
+        if (o < 1)
+            o = 1;
+        this->order = o;
+        parameter = new double[o + 1];
+        //不对传入的p进行检查
+        for (int i = 0; i < o + 1; i++) {
+            parameter[i] = p[i];
+        }
+        this->lowLim = lLim;
+        this->upperLim = uLim;
     }
 
 
     //设为虚函数，可被重载为其他映射关系
-    double mapping(double input) {
+    double mapping(double input,boolean needLimit=true) {
         double result = 0;
         double multiple = 1;
         for (int i = 0; i < (order + 1); i++) {
@@ -49,7 +67,11 @@ class Mapper :public CtrlAccessory{
             result += parameter[i] * multiple;
             multiple = 1;
         }
-        return result;
+        if(!needLimit){
+            return result;
+        }else{
+            return result<lowLim?lowLim:(result>upperLim?upperLim:result);
+        }
     }
 
     //按实际的次数更新参数，例如一阶则pos=1，更改二阶方程中二阶参数为99则为2,99
@@ -87,5 +109,10 @@ class Mapper :public CtrlAccessory{
         for (int i = 0; i < (order + 1); i++) {
             Serial.println(parameter[i]);
         }
+    }
+
+    void setLimit(double lower,double upper){
+        this->lowLim=lower;
+        this->upperLim = upper;
     }
 };
