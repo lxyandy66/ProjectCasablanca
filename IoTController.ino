@@ -46,9 +46,11 @@ IoTCtrlBoardManager ctrlManager;
 Chrono sampleChrono;  //节拍器,采样用
 Chrono outputChrono;  //节拍器,输出用
 
-// double  flowrateMeasure, valveCtrl;//flowrateSetPoint,
+//输出保存结果用
+double  flowrateMeasure,flowrateSetPoint,valveCtrl,valveOpening;
+
 // PID pidController(&flowrateMeasure,&valveCtrl,&flowrateSetPoint,2,0.21,1.26,DIRECT);
-PackedPID packedPidCtrlPackedPID(&flowRateCurrentReader,&valveOut, 3,2,0.21,1.26,0);
+PackedPID packedPidCtrlPackedPID(&flowRateCurrentReader,&valveOut, 0,21.9,1.08,0,0);
 
 // TestSystem sys(1);
 
@@ -82,6 +84,8 @@ void setup() {
     ctrlManager.addMapper(&flowRateMapper);
     ctrlManager.addMapper(&valveReadMapper);
     ctrlManager.addController(&packedPidCtrlPackedPID);
+
+    ctrlManager.setTakeOverTriggerPin(D6);
 
     //无线模块初始化
     Serial.begin(115200);
@@ -126,10 +130,14 @@ void loop() {
         // Serial.println("something coming");
         tempBuffer = Serial1.readStringUntil('\n');
         tempBuffer.trim();
-        Serial.println(tempBuffer);
+        Serial.println("Msg "+tempBuffer);
         //管理器处理指令
         ctrlManager.commandDistributor(tempBuffer);
        
+    }
+
+    if(Serial.available()){
+        ctrlManager.commandDistributor(Serial.readStringUntil('\n'));
     }
 
 
@@ -150,6 +158,8 @@ void loop() {
         //一直采样，但每一秒输出
         //"LoopCount: "+String(loopCount)+
         flowrateMeasure = flowRateCurrentReader.readAnalogSmoothly(false,true);  //仅在计算的时候更新PID的输入
+        flowrateSetPoint = packedPidCtrlPackedPID.getSetpoint();
+        valveOpening = valveReader.readAnalogSmoothly(false, true);
         // Serial.println("hello in the act");
         // 控制器更新
         // pidController.Compute();
@@ -170,11 +180,11 @@ void loop() {
         // Serial.println("Qset: " + String(ctrlManager.getSetpointById("C_FR")));
 
         //以下为实际用，直接用于测试中结果到处及数据处理
-        // Serial.println("LoopCount:"+String(loopCount)+" FlowrateVotage " +String(flowrateMeasure)); 
-        // Serial.println("LoopCount:"+String(loopCount)+" Valveopening " +String(valveReader.readAnalogSmoothly(false,true))); 
-        // Serial.println("LoopCount:"+String(loopCount)+" Vset "+String(valveCtrl));
-        // Serial.println("LoopCount:"+String(loopCount)+" Qset"+String(flowrateSetPoint));
-
+        Serial.println("LoopCount:"+String(loopCount)+" FlowrateVotage " +String(flowrateMeasure)); 
+        Serial.println("LoopCount:"+String(loopCount)+" Qset "+String(flowrateSetPoint));
+        Serial.println("LoopCount:"+String(loopCount)+" Valveopening " +String(valveOpening)); 
+        Serial.println("LoopCount:"+String(loopCount)+" Vset "+String(valveCtrl));
+        
         // PID计算后自动更新valveCtrl
         // flowrateMeasure = sys.updateState(valveCtrl);  //测试用
         // analogWrite(A3, valveCtrl);

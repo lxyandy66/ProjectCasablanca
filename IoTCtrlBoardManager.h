@@ -15,6 +15,7 @@ class IoTCtrlBoardManager : public CtrlBoardManager {
 
    void defaultCommandDistributor(DynamicJsonDocument str,String cmdType){
        if(cmdType=="TO"){
+        //    {cmd:"TO"}
            isTakeOver = !isTakeOver;
             Serial.println(isTakeOver ? "Ture" : "False");
             digitalWrite(takeOverTrigger, isTakeOver);
