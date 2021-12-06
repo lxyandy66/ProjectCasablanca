@@ -29,6 +29,8 @@ int loopCount;  //循环计数，便于后续对比不同方法所得采样数�
 const int SAMPLING_INTERVAL = 50;
 const int OUTPUT_INTERVAL = 1000;
 
+long reqId = -999;//显示是第几个包
+
 AnalogWriter valveOut(A3, 12);  //模拟测试时，直接加Virtual即可
 AnalogReader valveReader(A1, 12, 20);
 // AnalogReader flowRateVolatageReader(A2, 12, 20);
@@ -57,6 +59,8 @@ PackedPID packedPidCtrlPackedPID(&flowRateCurrentReader,&valveOut, 0,21.9,1.08,0
 void setup() {
     Serial.begin(115200);
     Serial.println("Start setup!");
+
+    wifi.hardReset();
 
     // IO初始化
     pinMode(D6, OUTPUT);
@@ -98,6 +102,8 @@ void setup() {
     }
     Serial.println("Debug Serial complete!");
 
+    
+    delay(1000);
     // set the data rate for the SoftwareSerial port
     while (!Serial1) {
         ;
@@ -132,7 +138,7 @@ void loop() {
         tempBuffer.trim();
         Serial.println("Msg "+tempBuffer);
         //管理器处理指令
-        ctrlManager.commandDistributor(tempBuffer);
+        reqId=ctrlManager.commandDistributor(tempBuffer);
        
     }
 
@@ -180,6 +186,7 @@ void loop() {
         // Serial.println("Qset: " + String(ctrlManager.getSetpointById("C_FR")));
 
         //以下为实际用，直接用于测试中结果到处及数据处理
+        Serial.println("LoopCount:"+String(loopCount)+" reqId " +String(reqId));
         Serial.println("LoopCount:"+String(loopCount)+" FlowrateVotage " +String(flowrateMeasure)); 
         Serial.println("LoopCount:"+String(loopCount)+" Qset "+String(flowrateSetPoint));
         Serial.println("LoopCount:"+String(loopCount)+" Valveopening " +String(valveOpening)); 

@@ -39,7 +39,7 @@ PackedPID* CtrlBoardManager::findControllerById(String str) {
     return nullptr;
 }
 
-void CtrlBoardManager::commandDistributor(String str) {
+long CtrlBoardManager::commandDistributor(String str) {
     // 检测收到命令的类型，例如CMD+***，即检测前面CMD，并分配至相应的处理方法
     // 例如{cmd:"MAP",id:"Flowrate",dt:{k:2,b:1}}
 
@@ -49,10 +49,11 @@ void CtrlBoardManager::commandDistributor(String str) {
     if (t) {
         this->debugPrint("in parse: get error");
         Serial.println(t.c_str());
-        return;
+        return -999;
     }
     //检测指令类型
     String cmdType = jsonBuffer[AgentProtocol::CMD_TYPE_FROM_JSON].as<String>();
+    long reqId = jsonBuffer[AgentProtocol::REQ_ID_FROM_JSON].as<long>();
     //根据指令类型分配
     if (cmdType == CtrlBoardManager::MAPPING_OPEARTION) {
         //读取到为映射器修改指令
@@ -62,7 +63,7 @@ void CtrlBoardManager::commandDistributor(String str) {
         Mapper* changedMapper = findMapperById(jsonBuffer[CtrlBoardManager::COMP_ID].as<String>());
         if (changedMapper == NULL || changedMapper == nullptr) {
             debugPrint("Mapper not found according to: " + jsonBuffer[CtrlBoardManager::COMP_ID].as<String>());
-            return;
+            return reqId;
         }
         //思路还是根据dt字段中JSON字符串传给Mapper自行处理
         boolean isSuccess = changedMapper->setParameter(jsonBuffer[AgentProtocol::DATA_FROM_JSON].as<String>());
@@ -73,7 +74,7 @@ void CtrlBoardManager::commandDistributor(String str) {
         PackedPID* changedController=findControllerById(jsonBuffer[CtrlBoardManager::COMP_ID].as<String>());
         if(changedController == NULL || changedController == nullptr){
             debugPrint("Controller not found according to: " + jsonBuffer[CtrlBoardManager::COMP_ID].as<String>());
-            return;
+            return reqId;
         }
         changedController->setSetpoint(jsonBuffer[CtrlBoardManager::CTRL_SETPOINT_DATA].as<double>());
     } else if(cmdType == CtrlBoardManager::CTRL_TUNING){
@@ -82,14 +83,16 @@ void CtrlBoardManager::commandDistributor(String str) {
         PackedPID* changedController=findControllerById(jsonBuffer[CtrlBoardManager::COMP_ID].as<String>());
         if(changedController == NULL || changedController == nullptr){
             debugPrint("Controller not found according to: " + jsonBuffer[CtrlBoardManager::COMP_ID].as<String>());
-            return;
+            return reqId;
         }
         changedController->tuningParameter(jsonBuffer[AgentProtocol::DATA_FROM_JSON].as<String>());
     } else if(cmdType==CtrlBoardManager::MGR_STATUS){
         // 例如{cmd:"STS"}
         this->showStatus();
+        return reqId;
     } else {
         defaultCommandDistributor(jsonBuffer, cmdType);
+        return reqId;
     }
     // showStatus();
 }

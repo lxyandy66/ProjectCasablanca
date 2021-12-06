@@ -39,7 +39,7 @@ class CtrlBoardManager {
     Mapper* findMapperById(String str);
     PackedPID* findControllerById(String str);
 
-    void commandDistributor(String str);
+    long commandDistributor(String str);
     virtual void defaultCommandDistributor(DynamicJsonDocument jsonStr,String cmdType);//用于处理未来需要匹配的命令
 
     // std::vector<String> split(String str, String pattern);

@@ -18,7 +18,7 @@ class IoTCtrlBoardManager : public CtrlBoardManager {
         //    {cmd:"TO"}
            isTakeOver = !isTakeOver;
             Serial.println(isTakeOver ? "Ture" : "False");
-            digitalWrite(takeOverTrigger, isTakeOver);
+            digitalWrite(takeOverTrigger, !isTakeOver);
             return;
        }
    }
