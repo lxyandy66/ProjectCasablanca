@@ -21,10 +21,11 @@ class PackedPID: public CtrlAccessory {
     static const char* TUNING_TD;
 
 //默认不调参则PID为1,0,0
-PackedPID(AnalogReader* inPort,AnalogWriter* outPort,double initSetpoint,int ControllerDirection)
-: CtrlAccessory("C_DEF"),inputPort(inPort),outputPort(outPort),setPoint(initSetpoint),
-pidController(&(this->ctrlInput),&(this->ctrlOutput),&(this->setPoint),1,0,0,ControllerDirection) {
-    isCtrlByMapping = true;
+    PackedPID(AnalogReader* inPort,AnalogWriter* outPort,double initSetpoint,int ControllerDirection)
+        : CtrlAccessory("C_DEF"),inputPort(inPort),outputPort(outPort),setPoint(initSetpoint),
+        pidController(&(this->ctrlInput),&(this->ctrlOutput),&(this->setPoint),1,0,0,ControllerDirection) {
+        isCtrlByMapping = true;
+    
     }
 
     PackedPID(AnalogReader* inPort, AnalogWriter* outPort, double initSetpoint,double kp, double ki, double kd,int ControllerDirection)
@@ -79,6 +80,10 @@ pidController(&(this->ctrlInput),&(this->ctrlOutput),&(this->setPoint),1,0,0,Con
                                  jsonBuffer[TUNING_TI].as<double>(),
                                  jsonBuffer[TUNING_TD].as<double>());
         return true;
+    }
+
+    void setEnable(boolean needEnable){
+        this->pidController.SetMode(needEnable ? 1 : 0);
     }
 };
 

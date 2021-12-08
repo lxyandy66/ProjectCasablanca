@@ -24,6 +24,8 @@ class CtrlBoardManager {
     static const char* CTRL_TUNING;
     static const int CMD_SIZE=512;
     static const char* COMP_ID;
+    static const char* CTRL_DATA_ON;
+    static const char* CTRL_ON;
 
     static const char* CTRL_SETPOINT_DATA;
 

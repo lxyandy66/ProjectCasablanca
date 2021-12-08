@@ -5,10 +5,12 @@
 const char* CtrlBoardManager::MAPPING_OPEARTION = "MAP";
 const char* CtrlBoardManager::CTRL_SETPOINT = "CT_SP";
 const char* CtrlBoardManager::CTRL_TUNING = "CT_TN";
+const char* CtrlBoardManager::CTRL_ON = "CT_ON";
 
 const char* CtrlBoardManager::COMP_ID = "id";
 
 const char* CtrlBoardManager::CTRL_SETPOINT_DATA = "sp";
+const char* CtrlBoardManager::CTRL_DATA_ON = "on";
 
 const char* CtrlBoardManager::MGR_STATUS = "STS";
 

@@ -14,9 +14,14 @@
 #include "PackedPID.h"
 #include "DevBoardESP8266.h"
 
-#define ESP_SSID "IBlab-Wifi"              //"TP-LINK_hvac" "BlackBerry Hotspot"
-#define ESP_PASS "iblabwifi"           // Your network password here "141242343"
-#define TCP_SERVER_ADDR "192.168.1.233"  // TCP服务器地址
+// #define ESP_SSID "IBlab-Wifi"              //"TP-LINK_hvac" "BlackBerry Hotspot"
+// #define ESP_PASS "iblabwifi"           // Your network password here "141242343"
+// #define TCP_SERVER_ADDR "192.168.1.233"  // TCP服务器地址
+
+#define ESP_SSID "BlackBerry Hotspot"              //"TP-LINK_hvac" "BlackBerry Hotspot"
+#define ESP_PASS "141242343"           // Your network password here "141242343"
+#define TCP_SERVER_ADDR "192.168.43.227"  // TCP服务器地址
+
 #define TCP_SERVER_PORT 1995           // TCP服务器地址
 
 DevBoardESP8266 wifi(&Serial1, &Serial, D3);
@@ -79,7 +84,7 @@ void setup() {
     //封装考虑优化一下
     packedPidCtrlPackedPID.setAcId("C_FR");
     packedPidCtrlPackedPID.needCtrlByMapping(true);
-    packedPidCtrlPackedPID.pidController.SetMode(AUTOMATIC);
+    packedPidCtrlPackedPID.pidController.SetMode(MANUAL);
     packedPidCtrlPackedPID.pidController.SetSampleTime(OUTPUT_INTERVAL);
     packedPidCtrlPackedPID.pidController.SetOutputLimits(1, 100);
 
@@ -120,11 +125,11 @@ void setup() {
     } else {
         Serial.println("Connecting Failed");
     }
-
+    delay(1000);
     wifi.connectTCP(F(TCP_SERVER_ADDR), TCP_SERVER_PORT);
-
+    delay(500);
     wifi.setTransparentMode(true);
-
+    delay(500);
     flowrateMeasure = 0;
     valveCtrl = 0;
     Serial.println("Setup finished!");
@@ -136,10 +141,9 @@ void loop() {
         // Serial.println("something coming");
         tempBuffer = Serial1.readStringUntil('\n');
         tempBuffer.trim();
-        Serial.println("Msg "+tempBuffer);
-        //管理器处理指令
+        Serial.println("LoopCount:"+String(loopCount)+" Msg "+tempBuffer);
+        //管理器处理指令，在这一步中仅更新参数（如设定点等），不执行操作
         reqId=ctrlManager.commandDistributor(tempBuffer);
-       
     }
 
     if(Serial.available()){
@@ -170,10 +174,6 @@ void loop() {
         // 控制器更新
         // pidController.Compute();
         valveCtrl=packedPidCtrlPackedPID.updatedControl();//在实际中可以不用赋值，PID直接进行输出了
-
-        if (valveCtrl < 1) {
-            Serial.println("WARNING! ");
-        }
 
         // 以下为模拟测试结果用，可直接用串口绘图器绘图
         // Serial.println("FlowrateVotage: " + String(flowRateVolatageReader.readAnalogSmoothly(false,true)));

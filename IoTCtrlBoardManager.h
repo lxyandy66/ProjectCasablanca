@@ -13,13 +13,25 @@ class IoTCtrlBoardManager : public CtrlBoardManager {
 
    void setTakeOverTriggerPin(int pinNo) { this->takeOverTrigger = pinNo; }
 
-   void defaultCommandDistributor(DynamicJsonDocument str,String cmdType){
+   void defaultCommandDistributor(DynamicJsonDocument jsonBuffer,String cmdType){
        if(cmdType=="TO"){
         //    {cmd:"TO"}
            isTakeOver = !isTakeOver;
             Serial.println(isTakeOver ? "Ture" : "False");
             digitalWrite(takeOverTrigger, !isTakeOver);
             return;
-       }
+       }else if(cmdType==CtrlBoardManager::CTRL_ON){
+        // 例如{cmd:"CT_ON",id:"C_FR",on:true}
+        PackedPID* changedController=findControllerById(jsonBuffer[CtrlBoardManager::COMP_ID].as<String>());
+        if(changedController == NULL || changedController == nullptr){
+            debugPrint("Controller not found according to: " + jsonBuffer[CtrlBoardManager::COMP_ID].as<String>());
+            return ;
+        }
+        isTakeOver = jsonBuffer[CtrlBoardManager::CTRL_DATA_ON].as<bool>();
+        changedController->pidController.SetMode(isTakeOver);
+        Serial.println(isTakeOver ? "Ture" : "False");
+        digitalWrite(takeOverTrigger, !isTakeOver);
+        return;
+    }
    }
 };
