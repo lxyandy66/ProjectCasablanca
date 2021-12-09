@@ -127,12 +127,14 @@ void setup() {
     }
     delay(1000);
     wifi.connectTCP(F(TCP_SERVER_ADDR), TCP_SERVER_PORT);
-    delay(500);
+    delay(5000);
     wifi.setTransparentMode(true);
-    delay(500);
+    delay(2000);
+    // if(Serial1.available())
     flowrateMeasure = 0;
     valveCtrl = 0;
     Serial.println("Setup finished!");
+    delay(1000);
 }
 
 void loop() {
