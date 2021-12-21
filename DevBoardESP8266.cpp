@@ -482,13 +482,18 @@ boolean DevBoardESP8266::sendContentDirectly(String content) {
   return true;
 }
 
-void DevBoardESP8266::setTransparentMode(boolean isDuplex = true) {
+boolean DevBoardESP8266::setTransparentMode(boolean isDuplex = true) {
   println(F("AT+CIPMODE=1"));//进入透传模式
-  if (isDuplex) {
+  if (find()){//接收透传会返回OK
+    if (isDuplex) {
     delay(250);
-    println(F("AT+CIPSEND"));//允许直接发送信息
+    println(F("AT+CIPSEND"));//允许直接发送信息，否则仅接收是透传
+    //进入发送透传同样会再次返回OK
+    return find();
+    }
+    return false;
   }
-
+  return false;
 }
 
 
@@ -504,4 +509,21 @@ String DevBoardESP8266::getIpAddress() {
   { // IP addr check failed
     debug->println(F("error"));
   }
+}
+
+
+boolean DevBoardESP8266::connectUDP(Fstr*hoststr, int remotePort, int localPort){
+  print(F("AT+CIPSTART=\"UDP\",\""));
+  print(hoststr);
+  print(F("\","));
+  print(remotePort);
+  print(F(","));
+  print(localPort);
+  print(F(","));
+  println("0");
+  if (find(F("CONNECT"))){
+    host = hoststr;
+    return true;
+  }
+  return false;
 }

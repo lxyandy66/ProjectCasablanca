@@ -26,14 +26,16 @@ class DevBoardESP8266 : public Print {
     boolean hardReset(void), softReset(void), sendContent(Fstr*content), sendContent(String content),
         sendContentDirectly(String content), find(Fstr*str = NULL, boolean ipd = false),
         connectToAP(Fstr*ssid, Fstr*pass), connectToAP(Fstr*ssid, Fstr*pass, boolean needChangeMode),
-        connectTCP(Fstr*host, int port), requestURL(Fstr*url), requestURL(char*url);
+        connectTCP(Fstr*host, int port), 
+        connectUDP(Fstr* host, int remotePort, int localPort),
+        requestURL(Fstr*url), requestURL(char*url), setTransparentMode(boolean isDuplex);
     int readLine(char* buf, int bufSiz);
     void closeAP(void), closeTCP(void), debugLoop(void),
         setTimeouts(uint32_t rcv = ESP_RECEIVE_TIMEOUT,
                     uint32_t rst = ESP_RESET_TIMEOUT,
                     uint32_t con = ESP_CONNECT_TIMEOUT,
                     uint32_t ipd = ESP_IPD_TIMEOUT),
-        setBootMarker(Fstr*s = NULL), setTransparentMode(boolean isDuplex);
+        setBootMarker(Fstr*s = NULL);
 
    private:
     Stream *stream,  // -> ESP8266, e.g. SoftwareSerial or Serial1

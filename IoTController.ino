@@ -22,6 +22,13 @@
 #define ESP_PASS "141242343"           // Your network password here "141242343"
 #define TCP_SERVER_ADDR "192.168.43.227"  // TCP服务器地址
 
+#define ESP_SSID "superb"              //"TP-LINK_hvac" "BlackBerry Hotspot"
+#define ESP_PASS "bugaosuni"           // Your network password here "141242343"
+
+#define UDP_SERVER_ADDR "192.168.3.21"  // UDP服务器地址
+#define UDP_SERVER_PORT 2021           // UDP服务器地址
+#define UDP_LOCAL_PORT 1995           // UDP服务器地址
+
 #define TCP_SERVER_PORT 1995           // TCP服务器地址
 
 DevBoardESP8266 wifi(&Serial1, &Serial, D3);
@@ -45,7 +52,7 @@ AnalogReader flowRateCurrentReader(A0, 12,20);
 
 // Mapper flowRateMapper(1,new double[2]{0.0024,-2.3482},"FRM");
 // Mapper valveReadMapper(1,new double[2]{0.0428,-35.67},"VM");
-Mapper flowRateMapper(1, new double[2]{0.0029, -1.7216}, "FRM");
+Mapper flowRateMapper(1, new double[2]{0.0029, -1.7626}, "FRM");
 Mapper valveReadMapper(1, new double[2]{0.0432, -25.502}, "VRM");
 Mapper valveWriteMapper(1, new double[2]{39.131, -39.758}, "VWM");
 IoTCtrlBoardManager ctrlManager;
@@ -126,10 +133,19 @@ void setup() {
         Serial.println("Connecting Failed");
     }
     delay(1000);
-    wifi.connectTCP(F(TCP_SERVER_ADDR), TCP_SERVER_PORT);
-    delay(5000);
+    // wifi.connectTCP(F(TCP_SERVER_ADDR), TCP_SERVER_PORT);
+    wifi.connectUDP(F(UDP_SERVER_ADDR), UDP_SERVER_PORT, UDP_LOCAL_PORT);
+    delay(2500);
+
+    while(Serial1.available()){
+        Serial.println(Serial1.readString());
+    }
+
     wifi.setTransparentMode(true);
-    delay(2000);
+    delay(2500);
+    while(Serial1.available()){
+        Serial.println(Serial1.readString());
+    }
     // if(Serial1.available())
     flowrateMeasure = 0;
     valveCtrl = 0;
