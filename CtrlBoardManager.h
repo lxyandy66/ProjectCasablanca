@@ -16,7 +16,9 @@ class CtrlBoardManager {
     std::vector<Mapper*> mapperContainer;
     std::vector<PackedPID*>controllerContainer;
     StaticJsonDocument<512> jsonOut;
-
+    StaticJsonDocument<512> jsonMeasureStatusOut;
+    long* loopCount;
+    long localReqId;
 
    public:
     static const char* MAPPING_OPEARTION;
@@ -31,9 +33,12 @@ class CtrlBoardManager {
 
     static const char* MGR_STATUS;
 
-
-
+    static const char* SER_OUT_LOOP;
+    
     CtrlBoardManager();
+
+    long getLoopCount();
+    void setLoopCount(long* loop);
 
     void addMapper(Mapper* mp);
     void addController(PackedPID* controller);
@@ -42,14 +47,19 @@ class CtrlBoardManager {
     PackedPID* findControllerById(String str);
 
     long commandDistributor(String str);
-    virtual void defaultCommandDistributor(DynamicJsonDocument jsonStr,String cmdType);//用于处理未来需要匹配的命令
+    virtual void defaultCommandDistributor(DynamicJsonDocument jsonStr,String cmdType);  //用于处理未来需要匹配的命令
 
-    // std::vector<String> split(String str, String pattern);
-    
+
     virtual void debugPrint(String str);
     double mappingValue(double originalValue, String mapperId);
 
     double getSetpointById(String controllerId);
 
-    void showStatus();
+    void showAccessoryStatus();
+    virtual String showMeasuredStatus(boolean inJsonFormat=true);
+
+    virtual String measuredStatusFormat();  // JSON形式输出测量值
+
+    virtual boolean checkReqOrder(long reqId);
+    virtual void oldMsgProcess(DynamicJsonDocument jsonBuffer, long reqId);//对旧消息的处理，此处仅提示，日后留用
 };

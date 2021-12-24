@@ -34,4 +34,11 @@ class IoTCtrlBoardManager : public CtrlBoardManager {
         return;
     }
    }
+
+
+   boolean checkReqOrder(long reqId){
+       //设为0避免接管等无时序命令被阻碍
+       return reqId==0?true:this->localReqId <= reqId;
+   }
+
 };

@@ -1,5 +1,6 @@
 #pragma once
 #include <PID_v1.h>
+#include <ArduinoJson.h>
 #include "AnalogReader.h"
 #include "AnalogWriter.h"
 #include "CtrlAccessory.h"
@@ -9,8 +10,11 @@ class PackedPID: public CtrlAccessory {
     // 实际上我就是不想让原来的PID的IO直接露出来
    
    private:
-    double setPoint, ctrlInput, ctrlOutput;  //作为直接与PID控制器交互的变量
+    double setPoint, ctrlInput, ctrlOutput,ctrlReadActualOut;  //作为直接与PID控制器交互的变量
+    String ctrlSetPointName, ctrlInputName, ctrlOutputName,ctrlReadActualOutName;
     AnalogReader* inputPort;
+    AnalogReader* readActualOutputPort;
+    //这纯粹是为了方便输出，其实控制里面不需要，即读取当前执行器的情况，例如，ctrlOutput为阀门设定开度，ctrlReadOutput为阀门当前实际开度
     AnalogWriter* outputPort;
     boolean isCtrlByMapping;//实际上对于这个类而言不知道自己的输入输出是模拟信号还是真实的物理量
 
@@ -25,13 +29,20 @@ class PackedPID: public CtrlAccessory {
         : CtrlAccessory("C_DEF"),inputPort(inPort),outputPort(outPort),setPoint(initSetpoint),
         pidController(&(this->ctrlInput),&(this->ctrlOutput),&(this->setPoint),1,0,0,ControllerDirection) {
         isCtrlByMapping = true;
-    
+        this->ctrlSetPointName = "C_DEF_SP";
+        this->ctrlInputName = "C_DEF_IN";
+        this->ctrlOutputName = "C_DEF_OUT";
+        this->ctrlReadActualOutName = "C_DEF_AOUT";
     }
 
     PackedPID(AnalogReader* inPort, AnalogWriter* outPort, double initSetpoint,double kp, double ki, double kd,int ControllerDirection)
         : CtrlAccessory("C_DEF"),inputPort(inPort), outputPort(outPort), setPoint(initSetpoint), 
         pidController(&(this->ctrlInput), &(this->ctrlOutput), &(this->setPoint), kp, ki, kd,ControllerDirection){
         isCtrlByMapping = true;
+        this->ctrlSetPointName = "C_DEF_SP";
+        this->ctrlInputName = "C_DEF_IN";
+        this->ctrlOutputName = "C_DEF_OUT";
+        this->ctrlReadActualOutName = "C_DEF_AOUT";
     }
 
     void enablePidController(boolean enable) { pidController.SetMode((enable?1:0)); }
@@ -49,12 +60,31 @@ class PackedPID: public CtrlAccessory {
         } else {
             this->outputPort->outputAnalogDirectly(this->ctrlOutput);
         }
+        if(readActualOutputPort!=NULL){
+            this->ctrlReadActualOut=readActualOutputPort->readAnalogSmoothly(false, isCtrlByMapping);
+        }
         return this->ctrlOutput;
         
     }
 
+    double getCtrlInput() { return this->ctrlInput; }
+    double getCtrlOutput() { return this->ctrlOutput; }
     void setSetpoint(double sp) { this->setPoint = sp; }
     double getSetpoint() { return this->setPoint; }
+
+
+    void setReadActualOutputPort(AnalogReader* readPort){
+        this->readActualOutputPort = readPort;
+    }
+
+    String getCtrlSetPointName() { return this->ctrlSetPointName; }
+    void setCtrlSetPointName(String spName) { this->ctrlSetPointName=spName; }
+    String getCtrlInputName() { return this->ctrlInputName; }
+    void setCtrlInputName(String inName) { this->ctrlInputName=inName; }
+    String getCtrlOutputName() { return this->ctrlOutputName; }
+    void setCtrlOutputName(String outName) { this->ctrlOutputName=outName; }
+    String getCtrlReadActualOutName() { return this->ctrlReadActualOutName; }
+    void setCtrlReadActualOutName(String outName) { this->ctrlReadActualOutName=outName; }
 
     void showParameters(){
         debugPrint("input: "+String(ctrlInput,2)+", output: "+String(ctrlOutput,2)+", setpoint: "+String(setPoint,2));
@@ -84,6 +114,16 @@ class PackedPID: public CtrlAccessory {
 
     void setEnable(boolean needEnable){
         this->pidController.SetMode(needEnable ? 1 : 0);
+    }
+
+    void outputStatus(JsonDocument* jsonDoc) {
+        (*jsonDoc)[AgentProtocol::DEV_ID_FROM_JSON] = this->acId;
+        (*jsonDoc)[this->ctrlSetPointName] = this->setPoint;
+        (*jsonDoc)[this->ctrlInputName] = CtrlAccessory::roundDecimal(this->ctrlInput,3) ;
+        (*jsonDoc)[this->ctrlOutputName] = CtrlAccessory::roundDecimal(this->ctrlOutput,2);
+        if(readActualOutputPort!=NULL){
+            (*jsonDoc)[this->ctrlReadActualOutName] = CtrlAccessory::roundDecimal(this->ctrlReadActualOut,2);
+        }
     }
 };
 

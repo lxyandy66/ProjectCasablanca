@@ -14,18 +14,18 @@
 #include "PackedPID.h"
 #include "DevBoardESP8266.h"
 
-// #define ESP_SSID "IBlab-Wifi"              //"TP-LINK_hvac" "BlackBerry Hotspot"
-// #define ESP_PASS "iblabwifi"           // Your network password here "141242343"
-// #define TCP_SERVER_ADDR "192.168.1.233"  // TCP服务器地址
+#define ESP_SSID "IBlab-Wifi"              //"TP-LINK_hvac" "BlackBerry Hotspot"
+#define ESP_PASS "iblabwifi"           // Your network password here "141242343"
+#define SERVER_ADDR "192.168.1.233"  // TCP服务器地址
 
-#define ESP_SSID "BlackBerry Hotspot"              //"TP-LINK_hvac" "BlackBerry Hotspot"
-#define ESP_PASS "141242343"           // Your network password here "141242343"
-#define TCP_SERVER_ADDR "192.168.43.227"  // TCP服务器地址
+// #define ESP_SSID "BlackBerry Hotspot"              //"TP-LINK_hvac" "BlackBerry Hotspot"
+// #define ESP_PASS "141242343"           // Your network password here "141242343"
+// #define SERVER_ADDR "192.168.43.227"  // TCP服务器地址
 
-#define ESP_SSID "superb"              //"TP-LINK_hvac" "BlackBerry Hotspot"
-#define ESP_PASS "bugaosuni"           // Your network password here "141242343"
+// #define ESP_SSID "superb"              //"TP-LINK_hvac" "BlackBerry Hotspot"
+// #define ESP_PASS "bugaosuni"           // Your network password here "141242343"
 
-#define UDP_SERVER_ADDR "192.168.3.21"  // UDP服务器地址
+// #define SERVER_ADDR "192.168.3.21"  // UDP服务器地址
 #define UDP_SERVER_PORT 2021           // UDP服务器地址
 #define UDP_LOCAL_PORT 1995           // UDP服务器地址
 
@@ -37,7 +37,7 @@ HardwareSerial Serial1(PA10, PA9);  // RX,TX
 String tempBuffer = "";
 boolean isTakeOver = true;
 int writeAnalog;
-int loopCount;  //循环计数，便于后续对比不同方法所得采样数据情况
+long loopCount;  //循环计数，便于后续对比不同方法所得采样数据情况
 const int SAMPLING_INTERVAL = 50;
 const int OUTPUT_INTERVAL = 1000;
 
@@ -52,7 +52,7 @@ AnalogReader flowRateCurrentReader(A0, 12,20);
 
 // Mapper flowRateMapper(1,new double[2]{0.0024,-2.3482},"FRM");
 // Mapper valveReadMapper(1,new double[2]{0.0428,-35.67},"VM");
-Mapper flowRateMapper(1, new double[2]{0.0029, -1.7626}, "FRM");
+Mapper flowRateMapper(1, new double[2]{0.0030, -1.7626}, "FRM");
 Mapper valveReadMapper(1, new double[2]{0.0432, -25.502}, "VRM");
 Mapper valveWriteMapper(1, new double[2]{39.131, -39.758}, "VWM");
 IoTCtrlBoardManager ctrlManager;
@@ -81,6 +81,9 @@ void setup() {
     digitalWrite(D6, HIGH);
     analogWrite(A3, 0);
     
+
+    //映射器的命名
+
     //映射器加入端口
     valveOut.setMapper(&valveWriteMapper);
     valveReader.setMapper(&valveReadMapper);
@@ -95,6 +98,13 @@ void setup() {
     packedPidCtrlPackedPID.pidController.SetSampleTime(OUTPUT_INTERVAL);
     packedPidCtrlPackedPID.pidController.SetOutputLimits(1, 100);
 
+    packedPidCtrlPackedPID.setCtrlSetPointName("Qs");
+    packedPidCtrlPackedPID.setCtrlInputName("Qr");
+    packedPidCtrlPackedPID.setCtrlOutputName("Vs");
+    packedPidCtrlPackedPID.setCtrlReadActualOutName("Vr");
+    packedPidCtrlPackedPID.setReadActualOutputPort(&valveReader);
+    
+    
     //控制管理器初始化
     //压入映射器
     ctrlManager.addMapper(&flowRateMapper);
@@ -102,6 +112,7 @@ void setup() {
     ctrlManager.addController(&packedPidCtrlPackedPID);
 
     ctrlManager.setTakeOverTriggerPin(D6);
+    ctrlManager.setLoopCount(&loopCount);
 
     //无线模块初始化
     Serial.begin(115200);
@@ -134,7 +145,7 @@ void setup() {
     }
     delay(1000);
     // wifi.connectTCP(F(TCP_SERVER_ADDR), TCP_SERVER_PORT);
-    wifi.connectUDP(F(UDP_SERVER_ADDR), UDP_SERVER_PORT, UDP_LOCAL_PORT);
+    wifi.connectUDP(F(SERVER_ADDR), UDP_SERVER_PORT, UDP_LOCAL_PORT);
     delay(2500);
 
     while(Serial1.available()){
@@ -179,12 +190,10 @@ void loop() {
         sampleChrono.restart();
     }
 
-    
-
     //输出与执行部分
     if (outputChrono.hasPassed(OUTPUT_INTERVAL)) {
         //一直采样，但每一秒输出
-        //"LoopCount: "+String(loopCount)+
+        //其实这个做法不太好，最好能整合到CtrlBoardManager里面
         flowrateMeasure = flowRateCurrentReader.readAnalogSmoothly(false,true);  //仅在计算的时候更新PID的输入
         flowrateSetPoint = packedPidCtrlPackedPID.getSetpoint();
         valveOpening = valveReader.readAnalogSmoothly(false, true);
@@ -192,6 +201,14 @@ void loop() {
         // 控制器更新
         // pidController.Compute();
         valveCtrl=packedPidCtrlPackedPID.updatedControl();//在实际中可以不用赋值，PID直接进行输出了
+        Serial.println(ctrlManager.showMeasuredStatus(true));
+        outputChrono.restart();
+        loopCount++;
+    }
+}
+
+// 阀门映射(value*0.0428-35.67)
+
 
         // 以下为模拟测试结果用，可直接用串口绘图器绘图
         // Serial.println("FlowrateVotage: " + String(flowRateVolatageReader.readAnalogSmoothly(false,true)));
@@ -203,19 +220,6 @@ void loop() {
         // Serial.println();
         // Serial.println("Qset: " + String(ctrlManager.getSetpointById("C_FR")));
 
-        //以下为实际用，直接用于测试中结果到处及数据处理
-        Serial.println("LoopCount:"+String(loopCount)+" reqId " +String(reqId));
-        Serial.println("LoopCount:"+String(loopCount)+" FlowrateVotage " +String(flowrateMeasure)); 
-        Serial.println("LoopCount:"+String(loopCount)+" Qset "+String(flowrateSetPoint));
-        Serial.println("LoopCount:"+String(loopCount)+" Valveopening " +String(valveOpening)); 
-        Serial.println("LoopCount:"+String(loopCount)+" Vset "+String(valveCtrl));
-        
         // PID计算后自动更新valveCtrl
         // flowrateMeasure = sys.updateState(valveCtrl);  //测试用
         // analogWrite(A3, valveCtrl);
-        outputChrono.restart();
-        loopCount++;
-    }
-}
-
-// 阀门映射(value*0.0428-35.67)
