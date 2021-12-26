@@ -16,7 +16,7 @@
 
 #define ESP_SSID "IBlab-Wifi"              //"TP-LINK_hvac" "BlackBerry Hotspot"
 #define ESP_PASS "iblabwifi"           // Your network password here "141242343"
-#define SERVER_ADDR "192.168.1.233"  // TCP服务器地址
+#define SERVER_ADDR "192.168.1.208"  // TCP服务器地址
 
 // #define ESP_SSID "BlackBerry Hotspot"              //"TP-LINK_hvac" "BlackBerry Hotspot"
 // #define ESP_PASS "141242343"           // Your network password here "141242343"
@@ -52,7 +52,7 @@ AnalogReader flowRateCurrentReader(A0, 12,20);
 
 // Mapper flowRateMapper(1,new double[2]{0.0024,-2.3482},"FRM");
 // Mapper valveReadMapper(1,new double[2]{0.0428,-35.67},"VM");
-Mapper flowRateMapper(1, new double[2]{0.0030, -1.7626}, "FRM");
+Mapper flowRateMapper(1, new double[2]{0.0030, -1.8726}, "FRM");
 Mapper valveReadMapper(1, new double[2]{0.0432, -25.502}, "VRM");
 Mapper valveWriteMapper(1, new double[2]{39.131, -39.758}, "VWM");
 IoTCtrlBoardManager ctrlManager;
@@ -170,7 +170,7 @@ void loop() {
         // Serial.println("something coming");
         tempBuffer = Serial1.readStringUntil('\n');
         tempBuffer.trim();
-        Serial.println("LoopCount:"+String(loopCount)+" Msg "+tempBuffer);
+        Serial.println(tempBuffer);
         //管理器处理指令，在这一步中仅更新参数（如设定点等），不执行操作
         reqId=ctrlManager.commandDistributor(tempBuffer);
     }

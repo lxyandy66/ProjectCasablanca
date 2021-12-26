@@ -78,14 +78,14 @@ long CtrlBoardManager::commandDistributor(String str) {
     
     if(reqId==0){
         //无时序指令，例如接管，显示参数等
-        break;
+        
     }else if(!checkReqOrder(reqId)){
         // 过时数据，直接返回
         oldMsgProcess(jsonBuffer, reqId);
         return reqId;
     }else{
         //时序数据，更新Id
-        
+
         this->localReqId = reqId;
     }
 
