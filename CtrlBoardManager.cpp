@@ -61,7 +61,7 @@ PackedPID* CtrlBoardManager::findControllerById(String str) {
 
 long CtrlBoardManager::commandDistributor(String str) {
     // 检测收到命令的类型，例如CMD+***，即检测前面CMD，并分配至相应的处理方法
-    // 例如{cmd:"MAP",id:"Flowrate",dt:{k:2,b:1}}
+    // 例如{cmd:"MAP",id:"FRM",dt:{k:2,b:1}}
 
     // JSON解析
     DynamicJsonDocument jsonBuffer(AgentProtocol::MSG_SIZE);
