@@ -1,53 +1,56 @@
+####20211228更新，串口数据直接从数据库中读取，并标准化为JSON格式####
+##读取数据及格式调整
+data.iot.raw<-read.csv(file = "./NCS_Data/IoT_1227_Ideal_Demo_MV=1_BV=0.75.csv",stringsAsFactors=FALSE)%>%as.data.table()
+options(digits.secs = 3)
+data.iot.raw[]$msg_logTime<-as.POSIXct(data.iot.raw$msg_logTime)
+data.iot.raw<-data.iot.raw[nchar(msg_content)>10]#Ture接管的指令，这一部分理论应该在JSON中处理，但是包调用有问题
 
-data.iot.raw<-as.data.table(read.xlsx(file = "IoTTest.xlsx",sheetName = "IoT_PoorNet_MV=1_BV_0"))
-
-#设置数据为毫秒级别
-options(digits.secs=3)
-data.iot.raw$datetime<-as.POSIXct(paste("2021-12-09 ",data.iot.raw$time))
-data.iot.raw$var<-as.character(data.iot.raw$var)
-
-data.iot.msg<-data.iot.raw[var=="Msg"]
-data.iot.msg$recInv<-data.iot.msg%>%{.$datetime-c(NA,.[1:(nrow(.)-1)]$datetime)}%>%as.numeric(.)
-data.iot.msg$jsonObj<-lapply(as.character(data.iot.msg$value),fromJSON)
-data.iot.msg$testIotId<-"Poor"
-
-data.iot.fmt<-dcast(data.iot.raw[,-"time"],formula = datetime+loop~var,fun.aggregate = paste,collapse="")
-#注意，这里一个loop不同的时间会出现两条，即一个loop下，Msg时间一条，记录参数一条，不影响
-
-
+#JSON数据取出
+data.iot.raw$msgJson<-lapply(data.iot.raw$msg_content,FUN = fromJSON)
+# rjson::fromJSON("{\"cmd\":\"CT_SP\",\"id\":\"C_FR\",\"rq\":3,\"sp\":\"0.000\"}{\"cmd\":\"CT_STS\"}",unexpected.escape = "keep") #不知道怎么回事就是弄不了
+nameFromJson<-c("lp","rq","id","Qs","Qr","Vs","Vr","cmd","id" ,"rq" ,"sp" )
+data.iot.raw[,':='(reqId=extractFromList(msgJson,"rq"),loop=extractFromList(msgJson,"lp"),
+                   Qs=extractFromList(msgJson,"Qs"),Qr=extractFromList(msgJson,"Qr"),
+                   Vs=extractFromList(msgJson,"Vs"),Vr=extractFromList(msgJson,"Vr"),
+                   sp=extractFromList(msgJson,"sp"),cmd=extractFromList(msgJson,"cmd"))]
+data.iot.raw[,sp:=as.numeric(sp)]
+#数据整理
+#串口回送的UDP数据，数据源为串口且cmd字段不为空
 data.iot.fmt<-data.iot.raw[,.(
-    iotTestId="Poor",
-    recTime=min(datetime[var=="Msg"],na.rm = TRUE),
-    actTime=max(datetime[var!="Msg"],na.rm = TRUE),
-    reqId=as.numeric(as.character(value[var=="reqId"][1])),
-    Qread=as.numeric(as.character(value[var=="FlowrateVotage"][1])),
-    Qset=as.numeric(as.character(value[var=="Qset"][1])),
-    ValveRead=as.numeric(as.character(value[var=="Valveopening"][1])),
-    VsetIot=as.numeric(as.character(value[var=="Vset"][1])),
-    msgLen=nchar(as.character(value[var=="Msg"][1])),
-    msgCount=length(value[var=="Msg"])
-),by=loop]
-data.iot.fmt$timeLabel<-format(data.iot.fmt$actTime,format="%Y-%m-%d %H:%M:%S")
-data.iot.fmt$msgNormal<-1
-data.iot.fmt[is.na(msgCount)|is.na(msgLen)|msgCount<1|msgLen>50]$msgNormal<-0
+    sendTime=msg_logTime[msg_source=="UDP"][1],
+    rcvTime=msg_logTime[msg_source=="Serial"&!is.na(cmd)][1],
+    rqSend=max(reqId[msg_source=="UDP"][1],na.rm = TRUE),#PC端发送的UDP包中reqId
+    rqRecv=max(reqId[msg_source=="Serial"&!is.na(cmd)][1],na.rm = TRUE),#本地收到回送的reqId
+    rqLocal=max(reqId[msg_source=="Serial"&is.na(cmd)][1],na.rm = TRUE),#本地控制用的reqId
+    localMsgCount=length(msg_logTime[msg_source=="Serial"]),
+    netMsgCount=length(msg_logTime[msg_source=="UDP"]),
+    localNetMsgCount=length(msg_logTime[msg_source=="Serial"&!is.na(cmd)]),
+    loopCount=length(unique(loop[!is.na(loop)])),
+    Qs=mean(Qs,na.rm=TRUE),
+    Qr=mean(Qr,na.rm=TRUE),
+    Vs=mean(Vs,na.rm=TRUE),
+    Vr=mean(Vr,na.rm=TRUE),
+    sp=mean(sp,na.rm=TRUE)
+    ),by=msg_label]
 
-data.iot.fmt[,-c("recTime","msgLen","msgLen")]%>%melt(.,id.var=c("loop","actTime","reqId","msgCount"))%>%{
-    ggplot(data=.[!variable%in%c("Qread","Qset")],
-           aes(x=loop,y=value,color=variable))+geom_line()+geom_line(aes(x=loop,y=msgCount*10))+
-        geom_line(data=.[variable%in%c("Qread","Qset")],
-                  aes(x=loop,y=value*100,color=variable))
-}
-# rm(data.iot.serLog.combine,data.iot.msg.combine)
-temp.names<-names(data.iot.serLog.combine)
-# data.ep.combine.temp[,..temp.names]
-data.iot.serLog.combine<-rbind(data.iot.serLog.combine,data.iot.fmt)
-data.iot.msg.combine<-rbind(data.iot.msg.combine,data.iot.msg)
+#计算接收消息和发送消息的间隔
+data.iot.fmt[,":="(timeInv=rcvTime-sendTime,rqRcvInv=rqSend-rqRecv,rqActInv=rqSend-rqLocal,isNormal:=ifelse(rqRcvInv==0,1,0))]
+data.ep.combine[,isNormal:=ifelse(rqRcvInv==0,1,0)]
 
-# data.iot.serLog.combine[data.iot.serLog.combine$labelTime%in% duplicated(labelTime)]%>%View
+#统计一下非正常的情况
+# 一个Label（PC端循环）肯定是一个UDP
+# 但一个Label内可能有多个串口消息
+# 正常为2，即1UDP转发，1状态输出，但由于时间错开
+
+table(data.iot.fmt$loopCount)
+
+ggplot(data=data.iot.fmt,aes(x=timeInv))+geom_density()
+
+save(data.iot.combine,data.iot.msg.combine,data.ep.combine,file = "TCP_旧版串口复制数据.rdata")
 
 ####机柜数据导入及处理####
-data.ep.raw<-fread(file="IoT_PoorNet_MV=1_BV=0_20211209.csv")
-data.ep.raw<-data.ep.raw[testId %in% c("IoT_1210_Ideal_MV=1_BV=0_4","IoT_1210_Weak_MV=1_BV=0")]
+data.ep.raw<-fread(file="./NCS_Data/Mearsure_IoT_1227_Ideal_Demo_MV=1_BV=0.75.csv")
+data.ep.raw<-data.ep.raw[!is.na(testId)]
 
 
 #不能直接label，因为每次重新执行labView时会重置，因此可能重复
@@ -70,30 +73,24 @@ for(i in unique(data.ep.test.second[testId!=""&!is.na(testId)]$testId)){
     data.ep.test.second[testId==i]$timeCount<-0:(nrow(data.ep.test.second[testId==i])-1)
 }
 
-####根据时间戳合并两者数据####
-data.ep.test.second$revTimeCount<-data.ep.test.second$timeCount+5
-
-data.ep.combine.temp<-merge(data.ep.test.second,data.iot.serLog.combine,
-                       all.x = TRUE,by.x="timeLabel")
-
-
-# data.ep.combine<-rbind(data.ep.combine,data.ep.combine.temp)
+####根据Label和msg_label合并两者数据####
+data.ep.combine<-merge(x=data.ep.test.second,y=data.iot.fmt,all.x=TRUE,by.x = "Label",by.y="msg_label")
 
 #可视化
-manualViewCol<-c("timeCount","testId","Flowrate","InWindT","t_out_set","flow_set","ValveRead","VsetIot")
-data.ep.combine[testId=="IoT_PoorNet_MV=1_BV=0",#&timeCount>300&timeCount<400
-                    c("timeCount","testId","ValveRead","VsetIot","Flowrate",
-                      "InWindT","t_out_set","flow_set","Qset","Qread","msgNormal"#,"predPressureStatus","resistanceS","isOn"
+manualViewCol<-c("timeCount","testId","Flowrate","InWindT","t_out_set","flow_set","Vr","Vs","sp","isNormal")
+data.ep.combine[,#&timeCount>300&timeCount<400timeCount%in%c(625:750)
+                    c("timeCount","testId","Vr","Vs","Flowrate","Valveopening","Vset",
+                      "InWindT","t_out_set","flow_set","Qs","Qr","sp","isNormal"#,"predPressureStatus","resistanceS","isOn"
                     )]%>%#,,"testVset","testVset",,"Kp","Ti","flow_set"
     melt(.,id.var=c("timeCount","testId"))%>%#,"Ti","para","testVset"
     as.data.table(.)%>%{ #,"InWindT","t_out_set","resistanceS"
-        ggplot(data=.[variable %in% c("ValveRead","VsetIot")],aes(x=timeCount,y=value,color=variable,width=4,group=paste(testId,variable)))+
-            # geom_line()+#geom_point()+
+        ggplot(data=.[variable %in% c("Vr","Vs","Valveopening")],aes(x=timeCount,y=value,color=variable,width=4,group=paste(testId,variable)))+
+            geom_line()+#geom_point()+
             # geom_point(data=.[variable %in% c("Subpressure")],aes(x=timeCount,y=value))+
-            geom_line(data=.[variable %in% c("Flowrate")],aes(x=timeCount,y=value*100))+#)+value#"OutWindT",(value-20)*5)
-            geom_line(data=.[variable %in% c("Qread")],aes(x=timeCount,y=value*100,lty=variable))+# geom_line(data=.[variable %in% c("msgCount")],aes(x=timeCount,y=value*100))+
-            # geom_line(data=.[variable %in% c("msgNormal")],aes(x=timeCount,y=value*100))+
-            # geom_line(data=.[variable %in% c("InWindT","t_out_set")],aes(x=timeCount,y=value,lty=variable))+
+            geom_line(data=.[variable %in% c("Flowrate","Qs")],aes(x=timeCount,y=value*100))+#)+value#"OutWindT",(value-20)*5),"sp","flow_set",
+            geom_line(data=.[variable %in% c("Qr")],aes(x=timeCount,y=value*100,lty=variable))+# geom_line(data=.[variable %in% c("msgCount")],aes(x=timeCount,y=value*100))+
+            # geom_line(data=.[variable %in% c("isNormal")],aes(x=timeCount,y=value*100))+
+            geom_line(data=.[variable %in% c("InWindT","t_out_set")],aes(x=timeCount,y=value,lty=variable))+
             # geom_line(data=.[variable %in% c("OutWindT","t_return_set")],aes(x=timeCount,y=value))+
             scale_y_continuous(sec.axis = sec_axis(~./100,name = "Flow rate"))+#./5+20
              # xlim(c(0,750))+

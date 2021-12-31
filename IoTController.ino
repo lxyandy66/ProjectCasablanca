@@ -52,7 +52,7 @@ AnalogReader flowRateCurrentReader(A0, 12,20);
 
 // Mapper flowRateMapper(1,new double[2]{0.0024,-2.3482},"FRM");
 // Mapper valveReadMapper(1,new double[2]{0.0428,-35.67},"VM");
-Mapper flowRateMapper(1, new double[2]{0.0030, -1.8726}, "FRM");
+Mapper flowRateMapper(1, new double[2]{0.0030, -1.8326}, "FRM");
 Mapper valveReadMapper(1, new double[2]{0.0432, -25.502}, "VRM");
 Mapper valveWriteMapper(1, new double[2]{39.131, -39.758}, "VWM");
 IoTCtrlBoardManager ctrlManager;
