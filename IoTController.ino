@@ -14,13 +14,13 @@
 #include "PackedPID.h"
 #include "DevBoardESP8266.h"
 
-#define ESP_SSID "IBlab-Wifi"              //"TP-LINK_hvac" "BlackBerry Hotspot"
-#define ESP_PASS "iblabwifi"           // Your network password here "141242343"
-#define SERVER_ADDR "192.168.1.208"  // TCP服务器地址
+// #define ESP_SSID "IBlab-Wifi"              //"TP-LINK_hvac" "BlackBerry Hotspot"
+// #define ESP_PASS "iblabwifi"           // Your network password here "141242343"
+// #define SERVER_ADDR "192.168.1.208"  // TCP服务器地址
 
-// #define ESP_SSID "BlackBerry Hotspot"              //"TP-LINK_hvac" "BlackBerry Hotspot"
-// #define ESP_PASS "141242343"           // Your network password here "141242343"
-// #define SERVER_ADDR "192.168.43.227"  // TCP服务器地址
+#define ESP_SSID "BlackBerry Hotspot"              //"TP-LINK_hvac" "BlackBerry Hotspot"
+#define ESP_PASS "141242343"           // Your network password here "141242343"
+#define SERVER_ADDR "192.168.43.215"  // TCP服务器地址
 
 // #define ESP_SSID "superb"              //"TP-LINK_hvac" "BlackBerry Hotspot"
 // #define ESP_PASS "bugaosuni"           // Your network password here "141242343"
@@ -49,12 +49,9 @@ AnalogReader valveReader(A1, 12, 20);
 AnalogReader flowRateCurrentReader(A0, 12,20);
 
 
-
-// Mapper flowRateMapper(1,new double[2]{0.0024,-2.3482},"FRM");
-// Mapper valveReadMapper(1,new double[2]{0.0428,-35.67},"VM");
-Mapper flowRateMapper(1, new double[2]{0.0030, -1.8326}, "FRM");
-Mapper valveReadMapper(1, new double[2]{0.0432, -25.502}, "VRM");
-Mapper valveWriteMapper(1, new double[2]{39.131, -39.758}, "VWM");
+Mapper flowRateMapper(1, new double[2]{0.002962, -1.782667}, "FRM");
+Mapper valveReadMapper(1, new double[2]{0.04219, -25.61501}, "VRM");
+Mapper valveWriteMapper(1, new double[2]{40.232, -98.526}, "VWM");
 IoTCtrlBoardManager ctrlManager;
 
 Chrono sampleChrono;  //节拍器,采样用
@@ -176,7 +173,10 @@ void loop() {
     }
 
     if(Serial.available()){
-        ctrlManager.commandDistributor(Serial.readStringUntil('\n'));
+        tempBuffer = Serial.readStringUntil('\n');
+        tempBuffer.trim();
+        Serial.println(tempBuffer);
+        reqId=ctrlManager.commandDistributor(tempBuffer);
     }
 
 
