@@ -37,9 +37,12 @@ double AnalogReader:: readAnalogDirectly(boolean needUpdated){//读取模拟输�
     return this->movCacu.getNewestElement();
 }
 
-double AnalogReader::readAnalogSmoothly(boolean needUpdated,boolean needMapping){
+double AnalogReader::readAnalogSmoothly(boolean needUpdated,boolean needMapping,boolean needSmooth){
+    //作为总入口好了
     if(needUpdated)
         readAnalogTool();
+    if(!needSmooth)
+        return needMapping?readAnalogByMapping(needUpdated):readAnalogDirectly(needUpdated);
     return needMapping?mappingValue(this->movCacu.getAverage()):this->movCacu.getAverage();
 }
 

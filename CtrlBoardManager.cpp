@@ -93,7 +93,7 @@ long CtrlBoardManager::commandDistributor(String str) {
     //还需要再封装一下，并设为虚函数，方便日后子类的继承
     if (cmdType == CtrlBoardManager::MAPPING_OPEARTION) {
         //读取到为映射器修改指令
-        // 例如{cmd:"MAP",id:"Flowrate",dt:{k:2,b:1}}
+        // 例如{cmd:"MAP",id:"FRM",dt:{k:2,b:1}}
         //mapper的参数可能会变化，即不一定是k,b，所以直接传dt进去好了
         // showAccessoryStatus();
         Mapper* changedMapper = findMapperById(jsonBuffer[CtrlBoardManager::COMP_ID].as<String>());
