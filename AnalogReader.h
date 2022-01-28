@@ -15,7 +15,7 @@ class AnalogReader : public AnalogIOPort {
     void updatedReadAnalog();  //只读取，不输出
     double readAnalogByMapping(boolean needUpdated=false);  //按照映射关系读取
     double readAnalogDirectly(boolean needUpdated=false);//直接按值读取
-    double readAnalogSmoothly(boolean needUpdated=false, boolean needMapping=false);
+    double readAnalogSmoothly(boolean needUpdated=false, boolean needMapping=false,boolean needSmooth=true);
 
     void setSmoothWindowSize(int size);
 

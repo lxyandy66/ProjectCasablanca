@@ -2,6 +2,7 @@
 #include "CtrlBoardManager.h"
 #include <vector>
 
+//cmd类型
 const char* CtrlBoardManager::MAPPING_OPEARTION = "MAP";
 const char* CtrlBoardManager::CTRL_SETPOINT = "CT_SP";
 const char* CtrlBoardManager::CTRL_TUNING = "CT_TN";
@@ -9,6 +10,7 @@ const char* CtrlBoardManager::CTRL_ON = "CT_ON";
 
 const char* CtrlBoardManager::COMP_ID = "id";
 
+//本地控制器相关
 const char* CtrlBoardManager::CTRL_SETPOINT_DATA = "sp";
 const char* CtrlBoardManager::CTRL_DATA_ON = "on";
 
@@ -16,13 +18,6 @@ const char* CtrlBoardManager::MGR_STATUS = "STS";
 
 
 const char* CtrlBoardManager::SER_OUT_LOOP="lp";
-// const char* CtrlBoardManager::SER_OUT_QSET = "Qs";
-// const char* CtrlBoardManager::SER_OUT_VREAD = "Vr";
-// const char* CtrlBoardManager::SER_OUT_QREAD="Qr";
-// const char* CtrlBoardManager::SER_OUT_QSET = "Qs";
-// const char* CtrlBoardManager::SER_OUT_VREAD = "Vr";
-// const char* CtrlBoardManager::SER_OUT_VSET="Vs";
-// const char* CtrlBoardManager::SER_OUT_INV="Inv";
 
 
 CtrlBoardManager::CtrlBoardManager() {}
@@ -43,6 +38,7 @@ void CtrlBoardManager::addController(PackedPID* controller){
     this->controllerContainer.push_back(controller);
 }
 
+
 Mapper* CtrlBoardManager::findMapperById(String str) {
     for (int i = 0; i < mapperContainer.size(); i++) {
         if (mapperContainer[i]->getAcId() == str)
@@ -58,6 +54,7 @@ PackedPID* CtrlBoardManager::findControllerById(String str) {
     }
     return nullptr;
 }
+
 
 long CtrlBoardManager::commandDistributor(String str) {
     // 检测收到命令的类型，例如CMD+***，即检测前面CMD，并分配至相应的处理方法

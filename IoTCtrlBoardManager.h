@@ -1,44 +1,32 @@
 #pragma once
 #include "CtrlBoardManager.h"
+#include "VirtualAnalogIO.h"
 
 class IoTCtrlBoardManager : public CtrlBoardManager {
     //CtrlBoardManager 的子类，实际使用于该项目中IoT控制板
-   private:
+    //实现跨网络的本地控制，即根据通过网络传递的传感器测量值进行本地控制
+   protected:
     int takeOverTrigger;//用于接管原控制的数字输出针脚
     boolean isTakeOver = false;
+    std::vector<VirtualAnalogReader*> virtualReaderContainer; //用于传感器的存储
+    
 
    public:
-   IoTCtrlBoardManager():CtrlBoardManager(){}
-   IoTCtrlBoardManager(int takeOverTriggerPin):CtrlBoardManager(),takeOverTrigger(takeOverTriggerPin){}
+   static const char* VIRTUAL_READ;
+   static const char* VIRTUAL_READ_DATA;
+//    static const char* VIRTUAL_READ;
+//    static const char* VIRTUAL_READ;
 
-   void setTakeOverTriggerPin(int pinNo) { this->takeOverTrigger = pinNo; }
+   IoTCtrlBoardManager();
+   IoTCtrlBoardManager(int takeOverTriggerPin);
 
-   void defaultCommandDistributor(DynamicJsonDocument jsonBuffer,String cmdType){
-       if(cmdType=="TO"){
-        //    {cmd:"TO"}
-           isTakeOver = !isTakeOver;
-            Serial.println(isTakeOver ? "Ture" : "False");
-            digitalWrite(takeOverTrigger, !isTakeOver);
-            return;
-       }else if(cmdType==CtrlBoardManager::CTRL_ON){
-        // 例如{cmd:"CT_ON",id:"C_FR",on:true}
-        PackedPID* changedController=findControllerById(jsonBuffer[CtrlBoardManager::COMP_ID].as<String>());
-        if(changedController == NULL || changedController == nullptr){
-            debugPrint("Controller not found according to: " + jsonBuffer[CtrlBoardManager::COMP_ID].as<String>());
-            return ;
-        }
-        isTakeOver = jsonBuffer[CtrlBoardManager::CTRL_DATA_ON].as<bool>();
-        changedController->pidController.SetMode(isTakeOver);
-        Serial.println(isTakeOver ? "Ture" : "False");
-        digitalWrite(takeOverTrigger, !isTakeOver);
-        return;
-    }
-   }
+   void setTakeOverTriggerPin(int pinNo);
 
+   void defaultCommandDistributor(DynamicJsonDocument jsonBuffer,String cmdType);
 
-   boolean checkReqOrder(long reqId){
-       //设为0避免接管等无时序命令被阻碍
-       return reqId==0?true:this->localReqId <= reqId;
-   }
+   void addVirtualReader(VirtualAnalogReader* virtualAin);
 
+   boolean checkReqOrder(long reqId);
+
+   VirtualAnalogReader* findVirtualReaderById(String str);
 };
