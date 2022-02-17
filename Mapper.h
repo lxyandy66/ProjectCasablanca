@@ -107,7 +107,7 @@ class Mapper :public CtrlAccessory{
 
     void showParameters() {
         for (int i = 0; i < (order + 1); i++) {
-            Serial.println(parameter[i]);
+            this->debugPrint(String(parameter[i],3)+" ");
         }
     }
 

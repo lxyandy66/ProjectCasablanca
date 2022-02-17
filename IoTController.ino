@@ -108,7 +108,7 @@ void setup() {
     packedPidCtrlPackedPID.setCtrlReadActualOutName("Vr");
     packedPidCtrlPackedPID.setReadActualOutputPort(&valveReader);
 
-    packedPidCtrlPackedPID.needSmoothinCtrl(false); //采用网络控制不需要平滑
+    packedPidCtrlPackedPID.needSmoothinCtrl(!isNetwork); //采用网络控制不需要平滑
 
     //控制管理器初始化
     //压入控制部件
