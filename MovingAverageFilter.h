@@ -24,6 +24,7 @@ class MovingAverageFilter {
         return getAverage();
     }
     void setWindowSize(int s) { this->windowSize = s; }     //设置滑窗大小
+    int getWindowSize() { return smoothQueue.size(); }      //查看滑窗大小
     T getNewestElement() { return smoothQueue.back(); }
     T getOldestElement() { return smoothQueue.front(); }
     virtual void updateSum(T appendEle, T deleteEle) = 0;   //容量超过，一个元素弹出，一个元素压入，此处更新求和

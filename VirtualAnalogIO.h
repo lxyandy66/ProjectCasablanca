@@ -6,20 +6,33 @@ class VirtualAnalogReader : public AnalogReader , public CtrlAccessory{
     //通过virtualAnalogRead来设定输出值
    private:
     double virtualAnalogRead;
+    double initalValue = 0;//避免在初始过程中队列为空导致异常
 
    protected:
     double readAnalogTool() {
         this->movCacu.append((double)virtualAnalogRead);
+        Serial.println("Virtual Read:"+String(virtualAnalogRead,3));
         return virtualAnalogRead;
     }
 
    public:
-    VirtualAnalogReader(int port, int res, int smoothSize) : AnalogReader(port, res, smoothSize) {}
-    
+    VirtualAnalogReader(int port, int res, int smoothSize) : AnalogReader(port, res, smoothSize) {
+        this->movCacu.append(initalValue);//避免在初始过程中队列为空导致异常
+    }
+
+    double readAnalogSmoothly(boolean needUpdated,boolean needMapping,boolean needSmooth){
+    //作为总入口好了
+        Serial.println("in Virtual AnalogRead readAnalogSmoothly");
+        return virtualAnalogRead;//*需要进一步优化一下*/
+    }
+
+    double getNewestValue() { return this->movCacu.getNewestElement(); }
+
     void setVirtualAnalog(double input) { this->virtualAnalogRead = input; }
 
     void showParameters(){
         this->debugPrint(this->acId + ": "+String(virtualAnalogRead, 3));
+        this->debugPrint(this->acId + " Queue size: "+this->movCacu.getWindowSize());
     }
 
     void outputStatus(JsonDocument* jsonDoc) {

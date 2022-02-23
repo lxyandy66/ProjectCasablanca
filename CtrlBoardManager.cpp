@@ -120,11 +120,7 @@ long CtrlBoardManager::commandDistributor(String str) {
         }
         changedController->tuningParameter(jsonBuffer[AgentProtocol::DATA_FROM_JSON].as<String>());
         return reqId;
-    } else if(cmdType==CtrlBoardManager::MGR_STATUS){
-        // 例如{cmd:"STS"}
-        this->showAccessoryStatus();
-        return reqId;
-    } else {
+    }  else {
         defaultCommandDistributor(jsonBuffer, cmdType);
         return reqId;
     }

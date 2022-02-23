@@ -29,4 +29,6 @@ class IoTCtrlBoardManager : public CtrlBoardManager {
    boolean checkReqOrder(long reqId);
 
    VirtualAnalogReader* findVirtualReaderById(String str);
+
+   void showAccessoryStatus();
 };

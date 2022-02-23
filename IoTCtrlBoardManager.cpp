@@ -31,7 +31,7 @@ void IoTCtrlBoardManager::defaultCommandDistributor(DynamicJsonDocument jsonBuff
         digitalWrite(takeOverTrigger, !isTakeOver);
         return;
     } else if (cmdType == IoTCtrlBoardManager::VIRTUAL_READ) {
-        // 例如 {cmd:"VA_IN",id:"VA_FR",rq:11,num:2.0}
+        // 例如 {cmd:"VA_IN",id:"VM_FR",rq:11,val:2.0}
         VirtualAnalogReader* virtualReader = findVirtualReaderById(
             jsonBuffer[CtrlBoardManager::COMP_ID].as<String>());
         if (virtualReader == NULL || virtualReader == nullptr) {
@@ -39,7 +39,15 @@ void IoTCtrlBoardManager::defaultCommandDistributor(DynamicJsonDocument jsonBuff
             return;
         }
         virtualReader->setVirtualAnalog(jsonBuffer[IoTCtrlBoardManager::VIRTUAL_READ_DATA].as<double>());
+        Serial.println("Virtual have read");
+        virtualReader->updatedReadAnalog();
+        Serial.println(virtualReader->getNewestValue());
+        Serial.println("Virtual have updated");
         return;
+    }else if(cmdType==CtrlBoardManager::MGR_STATUS){
+        // 例如{cmd:"STS"}
+        this->showAccessoryStatus();
+        return ;
     }
 }
 
@@ -59,4 +67,14 @@ VirtualAnalogReader* IoTCtrlBoardManager::findVirtualReaderById(String str) {
             return virtualReaderContainer[i];
     }
     return nullptr;
+}
+
+
+void IoTCtrlBoardManager::showAccessoryStatus(){
+    CtrlBoardManager::showAccessoryStatus();
+    Serial.println("Showing VirtualReader");
+    for (int i = 0; i < virtualReaderContainer.size(); i++) {
+        Serial.println("VirtualReader id: " + virtualReaderContainer[i]->getAcId() );
+        virtualReaderContainer[i]->showParameters();
+    }
 }
