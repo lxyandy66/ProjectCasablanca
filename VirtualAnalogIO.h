@@ -11,7 +11,7 @@ class VirtualAnalogReader : public AnalogReader , public CtrlAccessory{
    protected:
     double readAnalogTool() {
         this->movCacu.append((double)virtualAnalogRead);
-        Serial.println("Virtual Read:"+String(virtualAnalogRead,3));
+        // Serial.println("Virtual Read:"+String(virtualAnalogRead,3));
         return virtualAnalogRead;
     }
 
@@ -21,12 +21,20 @@ class VirtualAnalogReader : public AnalogReader , public CtrlAccessory{
     }
 
     double readAnalogSmoothly(boolean needUpdated,boolean needMapping,boolean needSmooth){
-    //作为总入口好了
-        Serial.println("in Virtual AnalogRead readAnalogSmoothly");
-        return virtualAnalogRead;//*需要进一步优化一下*/
+        //当前所有的VirtualAnalogReader均不进行任何处理直接返回
+        return virtualAnalogRead;
     }
 
-    double getNewestValue() { return this->movCacu.getNewestElement(); }
+    double readAnalogByMapping(boolean needUpdated){
+        //当前所有的VirtualAnalogReader均不进行任何处理直接返回
+        return virtualAnalogRead;
+    }
+
+    double readAnalogDirectly(boolean needUpdated){
+        return virtualAnalogRead;
+    }
+
+    double getVirtualAnalog() { return this->virtualAnalogRead; }
 
     void setVirtualAnalog(double input) { this->virtualAnalogRead = input; }
 

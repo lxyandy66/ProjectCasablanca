@@ -15,18 +15,18 @@
 #include "PackedPID.h"
 #include "DevBoardESP8266.h"
 
-// #define ESP_SSID "IBlab-Wifi"              //"TP-LINK_hvac" "BlackBerry Hotspot"
-// #define ESP_PASS "iblabwifi"           // Your network password here "141242343"
-// #define SERVER_ADDR "192.168.1.208"  // TCP服务器地址
+// #define ESP_SSID "TP-LINK_62D8-702"              //"TP-LINK_hvac" "BlackBerry Hotspot"
+// #define ESP_PASS "14/702/dfx"       // Your network password here "141242343""iblabwifi"   
+// #define SERVER_ADDR "192.168.0.119"  // TCP服务器地址
 
 #define ESP_SSID "BlackBerry Hotspot"              //"TP-LINK_hvac" "BlackBerry Hotspot"
 #define ESP_PASS "141242343"           // Your network password here "141242343"
 #define SERVER_ADDR "192.168.43.215"  // TCP服务器地址
 
-// #define ESP_SSID "superb"              //"TP-LINK_hvac" "BlackBerry Hotspot"
-// #define ESP_PASS "bugaosuni"           // Your network password here "141242343"
+// #define ESP_SSID "IBlab-Wifi"              //"TP-LINK_hvac" "BlackBerry Hotspot"
+// #define ESP_PASS "iblabwifi"           // Your network password here "141242343"
+// #define SERVER_ADDR "192.168.1.208"  // UDP服务器地址
 
-// #define SERVER_ADDR "192.168.3.21"  // UDP服务器地址
 #define UDP_SERVER_PORT 2021           // UDP服务器地址
 #define UDP_LOCAL_PORT 1995           // UDP服务器地址
 
@@ -50,7 +50,7 @@ AnalogWriter valveOut(A3, 12);  //模拟测试时，直接加Virtual即可
 AnalogReader valveReader(A1, 12, 20);
 // AnalogReader flowRateVolatageReader(A2, 12, 20);
 // AnalogReader flowRateCurrentReader(A0, 12,20);       //本地直接采集流量数据
-VirtualAnalogReader flowRateCurrentReader(A0, 12,isNetwork?1:20);    //通过网络获取流量数据
+VirtualAnalogReader flowRateCurrentReader(A0, 1,isNetwork?1:20);    //通过网络获取流量数据
 
 
 Mapper flowRateMapper(1, new double[2]{0.002962, -1.782667}, "FRM");
@@ -174,15 +174,17 @@ void setup() {
 void loop() {
     //串口命令检测
     if (Serial1.available()) {
-        // Serial.println("something coming");
-        tempBuffer = Serial1.readStringUntil('\n');
+        // Serial.println("something coming serial1");
+        tempBuffer = Serial1.readStringUntil('#');
+        //用特殊符号来操作似乎比空白符效果更好，可能空白符在发包的时候会被切掉
         tempBuffer.trim();
-        Serial.println(tempBuffer);
+        Serial.println(tempBuffer);//"udp got"
         //管理器处理指令，在这一步中仅更新参数（如设定点等），不执行操作
         reqId=ctrlManager.commandDistributor(tempBuffer);
     }
 
     if(Serial.available()){
+        // Serial.println("something coming serial");
         tempBuffer = Serial.readStringUntil('\n');
         tempBuffer.trim();
         Serial.println(tempBuffer);
@@ -193,17 +195,20 @@ void loop() {
     //采样部分
     if (sampleChrono.hasPassed(SAMPLING_INTERVAL)) {
         //高速采样
+        // Serial.println("sampling time trigger");
         // valveReader.setVirtualAnalog(valveCtrl);  //模拟测试用，假设valveCtrl是模拟量
         valveReader.updatedReadAnalog();
         // flowRateVolatageReader.setVirtualAnalog(flowrateMeasure);  //模拟测试用，假设flowrateMeasure是模拟量
-        flowRateCurrentReader.updatedReadAnalog();
+        // flowRateCurrentReader.updatedReadAnalog(); //网络更新时
         sampleChrono.restart();
+        // Serial.println("sampling time finished");
     }
 
     //输出与执行部分
     if (outputChrono.hasPassed(OUTPUT_INTERVAL)) {
         //一直采样，但每一秒输出
         //其实这个做法不太好，最好能整合到CtrlBoardManager里面
+        // Serial.println("output time trigger");
         flowrateMeasure = flowRateCurrentReader.readAnalogSmoothly(false,true,!isNetwork);  //仅在计算的时候更新PID的输入,是否平滑根据是否由网络控制决定
         flowrateSetPoint = packedPidCtrlPackedPID.getSetpoint();
         valveOpening = valveReader.readAnalogSmoothly(false, true);

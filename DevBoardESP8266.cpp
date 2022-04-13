@@ -463,20 +463,20 @@ boolean DevBoardESP8266::sendContent(Fstr* content)
   return false;
 }
 
-boolean DevBoardESP8266::sendContent(String content)
+//用传统的方法发送数据，且发送的为除去结尾换行符后数据
+boolean DevBoardESP8266::sendContent(String content,boolean needTrim)
 {
+  if(needTrim)
+      content.trim();
   print(F("AT+CIPSEND="));
   println(content.length());
-  if (find(F("> ")))
-  { // Wait for prompt
-    print(content);
-    print(F("\r\n\r\n")); // 4
-    return (find());      // Gets 'SEND OK' line
-  }
-  return false;
+  print(content);
+  print(F("\r\n\r\n")); 
+  
+  return true;
 }
 
-boolean DevBoardESP8266::sendContentDirectly(String content) {
+boolean DevBoardESP8266::sendContentDirectly(String content,boolean needTrim) {
   println(content);
   //debug->println("ESP: Send success!");
   return true;

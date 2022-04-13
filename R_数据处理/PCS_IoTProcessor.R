@@ -36,14 +36,18 @@ data.iot.fmt<-data.iot.raw[msg_testId=="IoT_1230_Weak_MV=1_BV=0_3",.(
     sp=mean(sp,na.rm=TRUE)
     ),by=msg_label]
 
-#计算接收消息和发送消息的间隔
+##计算接收消息和发送消息的间隔
+#去掉一些异常值
+data.iot.fmt[rqLocal<0]$rqLocal<-NA
+ggplot(data.iot.fmt,aes(x=rqLocal))+geom_density()
+
 data.iot.fmt[,":="(timeInv=rcvTime-sendTime,rqRcvInv=rqSend-rqRecv,rqActInv=rqSend-rqLocal)]#,isNormal:=ifelse(rqRcvInv==0,1,0)
 data.iot.fmt[,isNormal:=ifelse(rqRcvInv==0,1,0)]
 
 data.iot.fmt[,c("msg_label","rqActInv","rqRcvInv")]%>%melt(.,id.var="msg_label")%>%ggplot(.,aes(x=variable,y=value))+geom_boxplot()
 
-mean(data.iot.fmt[!is.infinite(rqRcvInv)]$rqRcvInv,na.rm = TRUE)
-mean(data.iot.fmt[!is.infinite(rqActInv)]$rqActInv,na.rm = TRUE)
+mean(data.iot.fmt[msg_label<900&!is.infinite(rqRcvInv)]$rqRcvInv,na.rm = TRUE)
+mean(data.iot.fmt[msg_label<900&!is.infinite(rqActInv)]$rqActInv,na.rm = TRUE)
 
 #统计一下非正常的情况
 # 一个Label（PC端循环）肯定是一个UDP
@@ -51,8 +55,8 @@ mean(data.iot.fmt[!is.infinite(rqActInv)]$rqActInv,na.rm = TRUE)
 # 正常为2，即1UDP转发，1状态输出，但由于时间错开
 
 #有效利用率
-table(data.iot.fmt[msg_label>900]$localNetMsgCoun)
-data.iot.fmt[msg_label<900&msg_label>550]%>%mutate(.,first=msg_label>750)%>%as.data.table(.)%>%{
+table(data.iot.fmt[msg_label<500&msg_label>300]$localNetMsgCoun)
+data.iot.fmt[msg_label<900]%>%mutate(.,first=msg_label>750)%>%as.data.table(.)%>%{
     cat(mean(.[first==TRUE]$timeInv,na.rm=TRUE),mean(.[first==FALSE]$timeInv,na.rm=TRUE))
     ggplot(data = .,aes(x=as.numeric(timeInv*1000-12.95)))+geom_density()+facet_wrap(.~first,nrow=2)+
         theme_bw()+theme(axis.text=element_text(size=18),axis.title=element_text(size=18,face="bold"),#legend.position = c(0.25,0.75),
@@ -60,14 +64,14 @@ data.iot.fmt[msg_label<900&msg_label>550]%>%mutate(.,first=msg_label>750)%>%as.d
 }
 
 #计算实际收到的包数，即包含乱序/应用层重叠接收/延迟的情况
-nchar(data.iot.raw[msg_testId=="IoT_1230_Weak_MV=1_BV=0_3"&msg_source=="Serial"&!is.na(cmd)&msg_label<750&msg_label>550]$msg_content)%>%{ceiling(./49)}%>%sum()
+nchar(data.iot.raw[msg_testId=="IoT_1230_Well_MV=1_BV=0_5"&msg_source=="Serial"&!is.na(cmd)&msg_label<900]$msg_content)%>%{ceiling(./49)}%>%sum()
 
 ggplot(data=data.iot.fmt,aes(x=as.numeric(timeInv)*1000))+geom_density()
 
 # save(data.iot.combine,data.iot.msg.combine,data.ep.combine,file = "TCP_旧版串口复制数据.rdata")
 
 ####机柜数据导入及处理####
-data.ep.raw<-fread(file="./NCS_Data/NCSTest_20211230.csv")
+data.ep.raw<-fread(file="./NCS_Data/Ti0.33_20220105.csv")
 data.ep.raw<-data.ep.raw[!is.na(testId)]
 
 
@@ -91,29 +95,35 @@ for(i in unique(data.ep.test.second[testId!=""&!is.na(testId)]$testId)){
     data.ep.test.second[testId==i]$timeCount<-0:(nrow(data.ep.test.second[testId==i])-1)
 }
 
+data.ep.test.second<-data.ep.test.second[testId=="Ti0.33_MV=1_BV=0_0105"]
+
+
 ####根据Label和msg_label合并两者数据####
-data.ep.combine<-merge(x=data.ep.test.second[testId=="IoT_1230_Weak_MV=1_BV=0_3"],y=data.iot.fmt,all.x=TRUE,by.x = "Label",by.y="msg_label")
+data.ep.combine<-merge(x=data.ep.test.second[testId=="IoT_1230_Well_MV=1_BV=0_5"],y=data.iot.fmt,all.x=TRUE,by.x = "Label",by.y="msg_label")
 
 #Mapping校正用
 ggplot(data.ep.combine,aes(y=Vr,x=Valveopening))+geom_point()
 lm(Vr~Valveopening,data.ep.combine)%>%summary()#[Flowrate>0.1]
 write.xlsx(data.ep.combine[,c("Time","loopCount","Label","Flowrate","Qr","Valveopening","Vr")],file = "自动采集_映射校正_1229.xlsx")
 
+
+#统计
+
 #可视化
-manualViewCol<-c("timeCount","testId","Flowrate","InWindT","t_out_set","flow_set","Vr","Vs","sp","isNormal")
-data.ep.combine[timeCount<900&timeCount>550,#&timeCount>300&timeCount<400timeCount%in%c(625:750)
-                    c("timeCount","testId","Vr","Vs","Flowrate","Valveopening","Vset",
-                      "InWindT","t_out_set","flow_set","Qs","Qr","sp","isNormal"#,"predPressureStatus","resistanceS","isOn"
+manualViewCol<-c("Time","timeCount","testId","Flowrate","InWindT","t_out_set","flow_set","Vr","Vs","sp","isNormal","Vset","Valveopening")#
+data.ep.combine.well[,#&timeCount>300&timeCount<400timeCount%in%c(625:750)
+                    c("timeCount","testId","Valveopening","Vset",#"Vr","Vs",,"Flowrate"
+                      "InWindT","t_out_set","flow_set","Qs","Qr","sp"#,"isNormal"#,"predPressureStatus","resistanceS","isOn"
                     )]%>%#,,"testVset","testVset",,"Kp","Ti","flow_set"
     melt(.,id.var=c("timeCount","testId"))%>%#,"Ti","para","testVset"
     as.data.table(.)%>%{ #,"InWindT","t_out_set","resistanceS"
-        ggplot(data=.[variable %in% c("Vr","Vs")],aes(x=timeCount,y=value,color=variable,width=4,group=paste(testId,variable)))+
+        ggplot(data=.[!variable %in% c("Qr","Qs","flow_set","Flowrate","sp")],aes(x=timeCount,y=value,color=variable,width=4,group=paste(testId,variable)))+#variable %in% c("Vr","Vs")
             geom_line()+#geom_point()+
             # geom_point(data=.[variable %in% c("Subpressure")],aes(x=timeCount,y=value))+
-            geom_line(data=.[variable %in% c("flow_set")],aes(x=timeCount,y=value*125))+#)+value#"OutWindT",(value-20)*5),"sp","flow_set","Flowrate",
-            geom_line(data=.[variable %in% c("Qr","Qs")],aes(x=timeCount,y=value*125,lty="twodash"))+# geom_line(data=.[variable %in% c("msgCount")],aes(x=timeCount,y=value*100))+
+            geom_line(data=.[variable %in% c("flow_set","Qs")],aes(x=timeCount,y=value*125))+#)+value#"OutWindT",(value-20)*5),"sp","flow_set","Flowrate",
+            geom_line(data=.[variable %in% c("Flowrate","Qr")],aes(x=timeCount,y=value*125,lty="twodash"))+# geom_line(data=.[variable %in% c("msgCount")],aes(x=timeCount,y=value*100))+
             # geom_line(data=.[variable %in% c("isNormal")],aes(x=timeCount,y=value*100))+
-            geom_line(data=.[variable %in% c("InWindT","t_out_set")],aes(x=timeCount,y=value,lty=variable))+
+            # geom_line(data=.[variable %in% c("InWindT","t_out_set")],aes(x=timeCount,y=value,lty=variable))+
             # geom_line(data=.[variable %in% c("OutWindT","t_return_set")],aes(x=timeCount,y=value))+
             scale_y_continuous(sec.axis = sec_axis(~./125,name = "Flow rate"))+#./5+20
              # xlim(c(0,750))+
@@ -122,16 +132,19 @@ data.ep.combine[timeCount<900&timeCount>550,#&timeCount>300&timeCount<400timeCou
                              legend.text = element_text(size=16))#
     }
 
-data.ep.combine[testId=="IoT_1210_Weak_MV=1_BV=0"&t_out_set==45&timeCount>20][,.(
+
+
+data.ep.combine.weak[t_out_set==50][,.(
     duration=min(timeCount,na.rm = TRUE),
-    peakime=timeCount[InWindT==min(InWindT,na.rm = TRUE)][1],
+    peakime=timeCount[InWindT==max(InWindT,na.rm = TRUE)][1],
     startTout=mean(InWindT[timeCount%in%1:10],na.rm=TRUE),#开始时刻的送风温度
-    startTroom=mean(OutWindT[timeCount%in%1:10],na.rm=TRUE),#开始时刻的室内温度
+    # startTroom=mean(OutWindT[timeCount%in%1:10],na.rm=TRUE),#开始时刻的室内温度
     startFlowrate=mean(Flowrate[timeCount%in%1:10],na.rm=TRUE),#开始时刻的流量
     meanValveBias=mean(abs(Valveopening-Vset),na.rm=TRUE),
     meanLastTout=mean(InWindT[timeCount%in% timeCount[(length(timeCount)-60):length(timeCount)]],na.rm = TRUE),#最后100s的波动情况#(length(timeCount)-60:length(timeCount))
     sdLastTout=sd(InWindT[timeCount%in% timeCount[(length(timeCount)-60):length(timeCount)]],na.rm = TRUE),#最后100s的波动情况
-    maxTout=min(InWindT,na.rm = TRUE),
-    overshoot=(min(InWindT,na.rm = TRUE)/mean(InWindT[timeCount%in% c((length(timeCount)-60):length(timeCount))],na.rm = TRUE))-1
+    maxTout=max(InWindT,na.rm = TRUE),
+    #注意overshoot的min或者max
+    overshoot=(max(InWindT,na.rm = TRUE)/mean(InWindT[timeCount%in% c((length(timeCount)-60):length(timeCount))],na.rm = TRUE))-1
 ),by=testId]
 

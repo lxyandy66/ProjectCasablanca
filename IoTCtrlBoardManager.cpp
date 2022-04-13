@@ -39,10 +39,7 @@ void IoTCtrlBoardManager::defaultCommandDistributor(DynamicJsonDocument jsonBuff
             return;
         }
         virtualReader->setVirtualAnalog(jsonBuffer[IoTCtrlBoardManager::VIRTUAL_READ_DATA].as<double>());
-        Serial.println("Virtual have read");
         virtualReader->updatedReadAnalog();
-        Serial.println(virtualReader->getNewestValue());
-        Serial.println("Virtual have updated");
         return;
     }else if(cmdType==CtrlBoardManager::MGR_STATUS){
         // 例如{cmd:"STS"}
@@ -72,7 +69,7 @@ VirtualAnalogReader* IoTCtrlBoardManager::findVirtualReaderById(String str) {
 
 void IoTCtrlBoardManager::showAccessoryStatus(){
     CtrlBoardManager::showAccessoryStatus();
-    Serial.println("Showing VirtualReader");
+    // Serial.println("Showing VirtualReader");
     for (int i = 0; i < virtualReaderContainer.size(); i++) {
         Serial.println("VirtualReader id: " + virtualReaderContainer[i]->getAcId() );
         virtualReaderContainer[i]->showParameters();
