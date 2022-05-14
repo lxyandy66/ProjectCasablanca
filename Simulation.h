@@ -1,29 +1,8 @@
 #pragma once
-//本程序包含虚拟物理系统、虚拟模拟IO借口，用于控制相关的测试
+#include "VirtualAnalogIO.h"
+//本程序包含虚拟物理系统, 用于控制相关的测试
 
-class VirtualAnalogReader : public AnalogReader {
-   private:
-    double virtualAnalogRead;
 
-   protected:
-    double readAnalogTool() {
-        this->movCacu.append((double)virtualAnalogRead);
-        return virtualAnalogRead;
-    }
-
-   public:
-    VirtualAnalogReader(int port, int res, int smoothSize) : AnalogReader(port, res, smoothSize) {}
-    void setVirtualAnalog(double input) { this->virtualAnalogRead = input; }
-};
-
-class VirtualAnalogWriter : public AnalogWriter {
-   private:
-    double virtualAnalogOut;
-
-   public:
-    VirtualAnalogWriter(int port, int res) : AnalogWriter(port, res) {}
-    void setVirtualAnalog(double input) { this->virtualAnalogOut = input; }
-};
 
 class TestSystem {
    public:

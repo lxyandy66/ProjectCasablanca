@@ -12,10 +12,10 @@ class AnalogReader : public AnalogIOPort {
     AnalogReader(int port,int res,int smoothSize=7);
 
     //模拟量输出与读取
-    void updatedReadAnalog();  //只读取，不输出
-    double readAnalogByMapping(boolean needUpdated=false);  //按照映射关系读取
-    double readAnalogDirectly(boolean needUpdated=false);//直接按值读取
-    double readAnalogSmoothly(boolean needUpdated=false, boolean needMapping=false);
+    virtual void updatedReadAnalog();  //只读取，不输出
+    virtual double readAnalogByMapping(boolean needUpdated=false);  //按照映射关系读取
+    virtual double readAnalogDirectly(boolean needUpdated=false);//直接按值读取
+    virtual double readAnalogSmoothly(boolean needUpdated=false, boolean needMapping=false,boolean needSmooth=true);
 
     void setSmoothWindowSize(int size);
 

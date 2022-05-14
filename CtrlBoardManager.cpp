@@ -2,6 +2,7 @@
 #include "CtrlBoardManager.h"
 #include <vector>
 
+//cmd类型
 const char* CtrlBoardManager::MAPPING_OPEARTION = "MAP";
 const char* CtrlBoardManager::CTRL_SETPOINT = "CT_SP";
 const char* CtrlBoardManager::CTRL_TUNING = "CT_TN";
@@ -9,6 +10,7 @@ const char* CtrlBoardManager::CTRL_ON = "CT_ON";
 
 const char* CtrlBoardManager::COMP_ID = "id";
 
+//本地控制器相关
 const char* CtrlBoardManager::CTRL_SETPOINT_DATA = "sp";
 const char* CtrlBoardManager::CTRL_DATA_ON = "on";
 
@@ -16,13 +18,6 @@ const char* CtrlBoardManager::MGR_STATUS = "STS";
 
 
 const char* CtrlBoardManager::SER_OUT_LOOP="lp";
-// const char* CtrlBoardManager::SER_OUT_QSET = "Qs";
-// const char* CtrlBoardManager::SER_OUT_VREAD = "Vr";
-// const char* CtrlBoardManager::SER_OUT_QREAD="Qr";
-// const char* CtrlBoardManager::SER_OUT_QSET = "Qs";
-// const char* CtrlBoardManager::SER_OUT_VREAD = "Vr";
-// const char* CtrlBoardManager::SER_OUT_VSET="Vs";
-// const char* CtrlBoardManager::SER_OUT_INV="Inv";
 
 
 CtrlBoardManager::CtrlBoardManager() {}
@@ -43,6 +38,7 @@ void CtrlBoardManager::addController(PackedPID* controller){
     this->controllerContainer.push_back(controller);
 }
 
+
 Mapper* CtrlBoardManager::findMapperById(String str) {
     for (int i = 0; i < mapperContainer.size(); i++) {
         if (mapperContainer[i]->getAcId() == str)
@@ -58,6 +54,7 @@ PackedPID* CtrlBoardManager::findControllerById(String str) {
     }
     return nullptr;
 }
+
 
 long CtrlBoardManager::commandDistributor(String str) {
     // 检测收到命令的类型，例如CMD+***，即检测前面CMD，并分配至相应的处理方法
@@ -93,7 +90,7 @@ long CtrlBoardManager::commandDistributor(String str) {
     //还需要再封装一下，并设为虚函数，方便日后子类的继承
     if (cmdType == CtrlBoardManager::MAPPING_OPEARTION) {
         //读取到为映射器修改指令
-        // 例如{cmd:"MAP",id:"Flowrate",dt:{k:2,b:1}}
+        // 例如{cmd:"MAP",id:"FRM",dt:{k:2,b:1}}
         //mapper的参数可能会变化，即不一定是k,b，所以直接传dt进去好了
         // showAccessoryStatus();
         Mapper* changedMapper = findMapperById(jsonBuffer[CtrlBoardManager::COMP_ID].as<String>());
@@ -123,11 +120,7 @@ long CtrlBoardManager::commandDistributor(String str) {
         }
         changedController->tuningParameter(jsonBuffer[AgentProtocol::DATA_FROM_JSON].as<String>());
         return reqId;
-    } else if(cmdType==CtrlBoardManager::MGR_STATUS){
-        // 例如{cmd:"STS"}
-        this->showAccessoryStatus();
-        return reqId;
-    } else {
+    }  else {
         defaultCommandDistributor(jsonBuffer, cmdType);
         return reqId;
     }

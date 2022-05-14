@@ -17,8 +17,9 @@ class PackedPID: public CtrlAccessory {
     //这纯粹是为了方便输出，其实控制里面不需要，即读取当前执行器的情况，例如，ctrlOutput为阀门设定开度，ctrlReadOutput为阀门当前实际开度
     AnalogWriter* outputPort;
     boolean isCtrlByMapping;//实际上对于这个类而言不知道自己的输入输出是模拟信号还是真实的物理量
+    boolean needSmooth;//这个变量控制是否需要平滑，通常如果网络介入底层控制，即传感器信号通过网络发送，则不需平滑；如果通过本地ADC采样则需要平滑
 
-    public:
+   public:
     PID pidController; //公有好了，外部方便更新
     static const char* TUNING_KP;
     static const char* TUNING_TI;
@@ -33,6 +34,7 @@ class PackedPID: public CtrlAccessory {
         this->ctrlInputName = "C_DEF_IN";
         this->ctrlOutputName = "C_DEF_OUT";
         this->ctrlReadActualOutName = "C_DEF_AOUT";
+        this->needSmooth = true;
     }
 
     PackedPID(AnalogReader* inPort, AnalogWriter* outPort, double initSetpoint,double kp, double ki, double kd,int ControllerDirection)
@@ -43,8 +45,11 @@ class PackedPID: public CtrlAccessory {
         this->ctrlInputName = "C_DEF_IN";
         this->ctrlOutputName = "C_DEF_OUT";
         this->ctrlReadActualOutName = "C_DEF_AOUT";
+        this->needSmooth = true;
     }
 
+    void needSmoothinCtrl(boolean needS) { this->needSmooth = needS; }
+    
     void enablePidController(boolean enable) { pidController.SetMode((enable?1:0)); }
     
     void needCtrlByMapping(boolean needMapping){
