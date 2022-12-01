@@ -1,6 +1,6 @@
 {
     "board": "STMicroelectronics:stm32:Nucleo_32",
     "configuration": "pnum=NUCLEO_L432KC,upload_method=MassStorage,xserial=generic,usb=none,xusb=FS,opt=osstd,rtlib=nano",
-    "sketch": "AnalogeTester.ino",
-    "port": "/dev/tty.usbmodem14131403"
+    "sketch": "IoTController.ino",
+    "port": "/dev/tty.usbmodem14103"
 }

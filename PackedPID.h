@@ -58,7 +58,10 @@ class PackedPID: public CtrlAccessory {
 
     double updatedControl(){
         //每次计算时通过AnalogReader的平滑输出来更新PID控制器交互的变量
-        this->ctrlInput = inputPort->readAnalogSmoothly(false, isCtrlByMapping);
+        this->ctrlInput = inputPort->readAnalogSmoothly(false, isCtrlByMapping,false);//needSmooth
+        // Serial.println("From PID: ctrlInput: "+String(ctrlInput)+needSmooth?"Smoth Y":"Smth N");
+        // Serial.println((VirtualAnalogReader*)inputPort->showAccessoryStatus());
+        // Serial.println(inputPort->());
         pidController.Compute();
         if (isCtrlByMapping) {
             this->outputPort->outputAnalogByMapping(this->ctrlOutput);

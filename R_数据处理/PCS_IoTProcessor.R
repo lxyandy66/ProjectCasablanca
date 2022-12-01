@@ -32,6 +32,7 @@ data.iot.raw[,':='(sp=as.numeric(sp),val=as.numeric(val))]
 #如果只考虑实际执行，则只取串口的输出数据，即为用于采样的数据
 data.iot.raw.exc<-data.iot.raw[msg_testId=="IoT_V2O_MV=1_BV=0.25_LTE2"&
                                    msg_source=="Serial"&!is.na(loop),-c("msg_id","msg_source","msg_content","msgJson","sp","cmd","val")]
+data.iot.raw.exc<-data.iot.raw.exc[!duplicated(data.iot.raw.exc[,"msg_label"])]
 
 #数据整理
 #串口回送的UDP数据，数据源为串口且cmd字段不为空
@@ -94,7 +95,7 @@ data.iot.raw[msg_testId=="IoT_V2O_MV=1_BV=0.25_LTE2",c("msg_logTime","msg_label"
 
 #按机柜一个label下，收到了多少个Serial来的包可以看出来粘滞情况
 # 即一秒钟，可能由于粘滞，和井号切割 收到多个UDP包/缓存的UDP包，在串口中迅速读取
-table(data.iot.raw[msg_testId=="IoT_V2O_MV=1_BV=0.25_LTE2",c("msg_logTime","msg_label","msg_content")]$msg_label)%>%View
+table(data.iot.raw[msg_testId=="IoT_V2O_MV=1_BV=0.25_LTE2"&msg_source=="Serial",c("msg_logTime","msg_label","msg_content")]$msg_label)%>%View
 
 # save(data.iot.combine,data.iot.msg.combine,data.ep.combine,file = "TCP_旧版串口复制数据.rdata")
 

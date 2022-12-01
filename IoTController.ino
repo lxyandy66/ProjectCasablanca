@@ -32,6 +32,8 @@
 
 #define TCP_SERVER_PORT 1995           // TCP服务器地址
 
+#define IF_WIFI false                   //是否Wi-Fi，若为否，直接从硬串口读取数据，适用于5G模块
+
 DevBoardESP8266 wifi(&Serial1, &Serial, D3);
 HardwareSerial Serial1(PA10, PA9);  // RX,TX
 
@@ -65,7 +67,8 @@ Chrono outputChrono;  //节拍器,输出用
 double  flowrateMeasure,flowrateSetPoint,valveCtrl,valveOpening;
 
 // PID pidController(&flowrateMeasure,&valveCtrl,&flowrateSetPoint,2,0.21,1.26,DIRECT);
-PackedPID packedPidCtrlPackedPID(&flowRateCurrentReader,&valveOut, 0,21.9,1.08,0,0);
+// PackedPID packedPidCtrlPackedPID(&flowRateCurrentReader,&valveOut, 0,34.2,1.08,0,0);//阀门-流量控制
+PackedPID packedPidCtrlPackedPID(&flowRateCurrentReader,&valveOut, 0,1.78,0.011,0,0);//阀门-出风温度控制
 
 // TestSystem sys(1);
 
@@ -73,7 +76,10 @@ void setup() {
     Serial.begin(115200);
     Serial.println("Start setup!");
 
-    wifi.hardReset();
+    if(IF_WIFI){
+        wifi.hardReset();
+    }
+    
 
     // IO初始化
     pinMode(D6, OUTPUT);
@@ -91,19 +97,22 @@ void setup() {
     flowRateCurrentReader.setMapper(&flowRateMapper);
 
     //虚拟读取用
-    flowRateCurrentReader.setAcId("VM_FR");//virtual monitor flowrate
-    flowRateCurrentReader.setValueName("Qr_v");
+    // flowRateCurrentReader.setAcId("VM_FR");//virtual monitor flowrate
+    // flowRateCurrentReader.setValueName("Qr_v");
+    //虚拟读取送风温度
+    flowRateCurrentReader.setAcId("VM_TS");//virtual monitor flowrate
+    flowRateCurrentReader.setValueName("Ts_v");
 
     //控制器初始化
     //封装考虑优化一下
-    packedPidCtrlPackedPID.setAcId("C_FR");
+    packedPidCtrlPackedPID.setAcId("C_TS");//"C_FR"
     packedPidCtrlPackedPID.needCtrlByMapping(true);
     packedPidCtrlPackedPID.pidController.SetMode(MANUAL);
     packedPidCtrlPackedPID.pidController.SetSampleTime(OUTPUT_INTERVAL);
     packedPidCtrlPackedPID.pidController.SetOutputLimits(1, 100);
 
-    packedPidCtrlPackedPID.setCtrlSetPointName("Qs");
-    packedPidCtrlPackedPID.setCtrlInputName("Qr");
+    packedPidCtrlPackedPID.setCtrlSetPointName("Ts");//Qs
+    packedPidCtrlPackedPID.setCtrlInputName("Tsr");//Qr
     packedPidCtrlPackedPID.setCtrlOutputName("Vs");
     packedPidCtrlPackedPID.setCtrlReadActualOutName("Vr");
     packedPidCtrlPackedPID.setReadActualOutputPort(&valveReader);
@@ -126,6 +135,8 @@ void setup() {
     Serial1.begin(115200);
     Serial1.setTimeout(20);  //需要控制串口读取数据的超时设置，否则无法分开多条数据
     Serial.setTimeout(20);
+
+
     while (!Serial) {
         Serial.println("Wait for init Serial...");
         ;  // wait for serial port to connect. Needed for native USB port only
@@ -141,29 +152,38 @@ void setup() {
     Serial.println(" Wi-Fi Serial initialized!");
     // wifi.hardReset();
 
+    if(IF_WIFI){
+        //若通过Wi-Fi模块进行传输，需在此处进行模块设置
+        Serial.println(F("Connecting to WiFi..."));
+        boolean flag = wifi.connectToAP(F(ESP_SSID), F(ESP_PASS));
+
+        if (flag) {
+             Serial.println("Connecting Success");
+        } else {
+            Serial.println("Connecting Failed");
+        }
+        delay(1000);
+        // wifi.connectTCP(F(TCP_SERVER_ADDR), TCP_SERVER_PORT);
+        wifi.connectUDP(F(SERVER_ADDR), UDP_SERVER_PORT, UDP_LOCAL_PORT);
+        delay(2500);
+
+        while(Serial1.available()){
+            Serial.println(Serial1.readString());
+        }
+
+        wifi.setTransparentMode(true);
+        delay(2500);
+        while(Serial1.available()){
+            Serial.println(Serial1.readString());
+        }
+
+
+    }
+
+
     // Wi-Fi连接测试
-    Serial.println(F("Connecting to WiFi..."));
-    boolean flag = wifi.connectToAP(F(ESP_SSID), F(ESP_PASS));
+   
 
-    if (flag) {
-        Serial.println("Connecting Success");
-    } else {
-        Serial.println("Connecting Failed");
-    }
-    delay(1000);
-    // wifi.connectTCP(F(TCP_SERVER_ADDR), TCP_SERVER_PORT);
-    wifi.connectUDP(F(SERVER_ADDR), UDP_SERVER_PORT, UDP_LOCAL_PORT);
-    delay(2500);
-
-    while(Serial1.available()){
-        Serial.println(Serial1.readString());
-    }
-
-    wifi.setTransparentMode(true);
-    delay(2500);
-    while(Serial1.available()){
-        Serial.println(Serial1.readString());
-    }
     // if(Serial1.available())
     flowrateMeasure = 0;
     valveCtrl = 0;
@@ -178,7 +198,9 @@ void loop() {
         tempBuffer = Serial1.readStringUntil('#');
         //用特殊符号来操作似乎比空白符效果更好，可能空白符在发包的时候会被切掉
         tempBuffer.trim();
-        Serial.println(tempBuffer);//"udp got"
+        if(tempBuffer=="")
+            return;
+        Serial.println(tempBuffer);  //"udp got"
         //管理器处理指令，在这一步中仅更新参数（如设定点等），不执行操作
         reqId=ctrlManager.commandDistributor(tempBuffer);
     }
