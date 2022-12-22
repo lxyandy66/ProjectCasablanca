@@ -17,5 +17,10 @@ stat.carmen.indoor.raw<-data.carmen.indoor.raw.long[,.(location=location[1],
                                                        availableDelay=mean(value[value<1000],na.rm=TRUE)
                                                        ),by=variable]
 
+
+
 ggplot(data.carmen.indoor.raw.long,aes(x=destination,y=value,color=location))+
   geom_boxplot()+facet_wrap(.~transmitter)+ylim(c(0,1500))+stat_summary(fun.y = mean,geom="point")
+
+ggplot(data.carmen.indoor.raw.long,aes(x=value,color=location))+
+  geom_density()+facet_wrap(.~transmitter,nrow = 3)+xlim(c(0,500))

@@ -1,28 +1,35 @@
 ####20211228更新，串口数据直接从数据库中读取，并标准化为JSON格式####
 ##IoT数据
 #读取数据及格式调整
-data.iot.raw<-read.csv(file = "./NCS_Data/IoT_20220628_LTE.csv",stringsAsFactors=FALSE)%>%as.data.table()
+data.iot.raw<-read.csv(file = "./NCS_Data/IoT_SpeedTestAndMapping_1229.csv",stringsAsFactors=FALSE)%>%as.data.table()
 # data.iot.raw<-fread(file = "./NCS_Data/IoT_20220422_new.csv")
 options(digits.secs = 3)
 data.iot.raw$msg_logTime<-as.POSIXct(data.iot.raw$msg_logTime)
+unique(data.iot.raw$msg_testId)
 # validTestId<-c("IoT_1230_Ideal_MV=1_BV=0","IoT_1230_Well_MV=1_BV=0_5","IoT_1230_Weak_MV=1_BV=0_3","Conv_1230_MV=1_BV=0_5")
 data.iot.raw<-data.iot.raw[!is.na(msg_testId)&msg_testId!=""]#&msg_testId%in%validTestId
+# data.iot.raw<-data.iot.raw[!is.na(msg_testId)&msg_testId=="SpeedTest"]
+
 data.iot.raw<-data.iot.raw[startsWith(msg_content,"{")]
+
 #串口信息的预处理
 # 删去提示性信息
 data.iot.cmd<-data.iot.raw[nchar(msg_content)<40]#删掉一些串口提示信息
 data.iot.raw<-data.iot.raw[nchar(msg_content)>40]#删掉一些串口提示信息,含Ture接管的指令，这一部分理论应该在JSON中处理，但是包调用有问题
 
 
-#JSON数据取出
+####JSON数据取出####
+#注意，有些时候JSON里面有两个双引号
+data.iot.raw[,msg_content:=gsub('""','"',msg_content)]
+
 data.iot.raw$msgJson<-lapply(data.iot.raw$msg_content,FUN = jsonToListProcessor)
 
 
 # rjson::fromJSON("{\"cmd\":\"CT_SP\",\"id\":\"C_FR\",\"rq\":3,\"sp\":\"0.000\"}{\"cmd\":\"CT_STS\"}",unexpected.escape = "keep") #不知道怎么回事就是弄不了
 nameFromJson<-c("lp","rq","id","Qs","Qr","Vs","Vr","cmd","id" ,"rq" ,"sp" )
 data.iot.raw[,':='(reqId=extractFromList(msgJson,"rq"),loop=extractFromList(msgJson,"lp"),
-                   # Qs=extractFromList(msgJson,"Qs"),Qr=extractFromList(msgJson,"Qr"),
-                   Ts=extractFromList(msgJson,"Ts"),Tsr=extractFromList(msgJson,"Tsr"),#取决于跨网络的数据传输
+                   Qs=extractFromList(msgJson,"Qs"),Qr=extractFromList(msgJson,"Qr"),
+                   # Ts=extractFromList(msgJson,"Ts"),Tsr=extractFromList(msgJson,"Tsr"),#取决于跨网络的数据传输
                    Vs=extractFromList(msgJson,"Vs"),Vr=extractFromList(msgJson,"Vr"),
                    sp=extractFromList(msgJson,"sp"),cmd=extractFromList(msgJson,"cmd"),
                    val=extractFromList(msgJson,"val"))]
@@ -33,6 +40,39 @@ data.iot.raw[,':='(sp=as.numeric(sp),val=as.numeric(val))]
 data.iot.raw.exc<-data.iot.raw[msg_testId=="IoT_V2O_MV=1_BV=0.25_LTE2"&
                                    msg_source=="Serial"&!is.na(loop),-c("msg_id","msg_source","msg_content","msgJson","sp","cmd","val")]
 data.iot.raw.exc<-data.iot.raw.exc[!duplicated(data.iot.raw.exc[,"msg_label"])]
+
+
+####数据整理和延迟计算####
+# 注意，一个msg_label可能对应多个rq，且持久化的代码可能有点问题，存在资源竞争
+# reqId和msg_label不一定相等，一般source为UDP（即电脑端）持久化的大部分相等
+
+setorder(data.iot.raw,msg_logTime)
+data.iot.stat<-data.iot.raw[is.na(loop),#不考虑IoT自身状态回显的内容
+                 .(count=length(msg_logTime),
+                   msg_testId=msg_testId[1],
+                   msg_label=msg_label[msg_source=="UDP"][1],
+                   sndTime=msg_logTime[msg_source=="SerialSend"][1],
+                   rcvTime=msg_logTime[msg_source=="Serial"&!is.na(cmd)][1],
+                   rcvCount=length(msg_logTime[msg_source=="Serial"]),
+                   sndCount=length(msg_logTime[msg_source=="SerialSend"])#,#UDP
+                   # Ts=mean(Ts,na.rm=TRUE),
+                   # Tsr=mean(Tsr,na.rm=TRUE),
+                   # Vs=mean(Vs,na.rm=TRUE),
+                   # Vr=mean(Vr,na.rm=TRUE),
+                   # sp=mean(sp,na.rm=TRUE),
+                   # val=mean(val,na.rm=TRUE)
+                   ),by=msg_content]
+
+data.iot.stat[,delay:=rcvTime-sndTime]
+ggplot(data=data.iot.stat,aes(x=delay))+geom_density()
+
+nrow(data.iot.stat[delay>1])/nrow(data.iot.stat[!is.na(rcvTime)])#active packet loss，即延迟大于1秒
+nrow(data.iot.stat[!is.na(rcvTime)])/nrow(data.iot.stat)#纯丢包
+
+mean(data.iot.stat[delay<0.005]$delay,na.rm=TRUE)
+sd(data.iot.stat[delay<0.005]$delay,na.rm=TRUE)
+
+write.xlsx(data.iot.stat,file="PacketAnalysis_SpeedTest.xlsx")
 
 #数据整理
 #串口回送的UDP数据，数据源为串口且cmd字段不为空
