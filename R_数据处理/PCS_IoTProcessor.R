@@ -1,7 +1,7 @@
 ####20211228更新，串口数据直接从数据库中读取，并标准化为JSON格式####
 ##IoT数据
 #读取数据及格式调整
-data.iot.raw<-read.csv(file = "./NCS_Data/IoT_SpeedTestAndMapping_1229.csv",stringsAsFactors=FALSE)%>%as.data.table()
+data.iot.raw<-read.csv(file = "./NCS_Data/IoT_V2O_LTE_20230502.csv",stringsAsFactors=FALSE)%>%as.data.table()
 # data.iot.raw<-fread(file = "./NCS_Data/IoT_20220422_new.csv")
 options(digits.secs = 3)
 data.iot.raw$msg_logTime<-as.POSIXct(data.iot.raw$msg_logTime)
@@ -28,8 +28,8 @@ data.iot.raw$msgJson<-lapply(data.iot.raw$msg_content,FUN = jsonToListProcessor)
 # rjson::fromJSON("{\"cmd\":\"CT_SP\",\"id\":\"C_FR\",\"rq\":3,\"sp\":\"0.000\"}{\"cmd\":\"CT_STS\"}",unexpected.escape = "keep") #不知道怎么回事就是弄不了
 nameFromJson<-c("lp","rq","id","Qs","Qr","Vs","Vr","cmd","id" ,"rq" ,"sp" )
 data.iot.raw[,':='(reqId=extractFromList(msgJson,"rq"),loop=extractFromList(msgJson,"lp"),
-                   Qs=extractFromList(msgJson,"Qs"),Qr=extractFromList(msgJson,"Qr"),
-                   # Ts=extractFromList(msgJson,"Ts"),Tsr=extractFromList(msgJson,"Tsr"),#取决于跨网络的数据传输
+                   # Qs=extractFromList(msgJson,"Qs"),Qr=extractFromList(msgJson,"Qr"),
+                   Ts=extractFromList(msgJson,"Ts"),Tsr=extractFromList(msgJson,"Tsr"),#取决于跨网络的数据传输
                    Vs=extractFromList(msgJson,"Vs"),Vr=extractFromList(msgJson,"Vr"),
                    sp=extractFromList(msgJson,"sp"),cmd=extractFromList(msgJson,"cmd"),
                    val=extractFromList(msgJson,"val"))]
@@ -37,7 +37,7 @@ data.iot.raw[,':='(sp=as.numeric(sp),val=as.numeric(val))]
 
 ####实际控制器执行的数据####
 #如果只考虑实际执行，则只取串口的输出数据，即为用于采样的数据
-data.iot.raw.exc<-data.iot.raw[msg_testId=="IoT_V2O_MV=1_BV=0.25_LTE2"&
+data.iot.raw.exc<-data.iot.raw[msg_testId=="IoT_LTE_V2O_0502_MV=1_BV=0.25_Far"  &
                                    msg_source=="Serial"&!is.na(loop),-c("msg_id","msg_source","msg_content","msgJson","sp","cmd","val")]
 data.iot.raw.exc<-data.iot.raw.exc[!duplicated(data.iot.raw.exc[,"msg_label"])]
 
@@ -45,16 +45,20 @@ data.iot.raw.exc<-data.iot.raw.exc[!duplicated(data.iot.raw.exc[,"msg_label"])]
 ####数据整理和延迟计算####
 # 注意，一个msg_label可能对应多个rq，且持久化的代码可能有点问题，存在资源竞争
 # reqId和msg_label不一定相等，一般source为UDP（即电脑端）持久化的大部分相等
+# msg_source: 
+# Serial=串口接收，实际上即IoT设备传回
+# SerialSend=串口发送，实际上即是串口发送的命令，很少
+# UDP=电脑端UDP发送，实际上即电脑通过UDP发送后的持久化
 
 setorder(data.iot.raw,msg_logTime)
-data.iot.stat<-data.iot.raw[is.na(loop),#不考虑IoT自身状态回显的内容
+data.iot.stat<-data.iot.raw[is.na(loop)&msg_testId=="IoT_LTE_V2O_0502_MV=1_BV=0.25_Close",#不考虑IoT自身状态回显的内容
                  .(count=length(msg_logTime),
                    msg_testId=msg_testId[1],
                    msg_label=msg_label[msg_source=="UDP"][1],
-                   sndTime=msg_logTime[msg_source=="SerialSend"][1],
+                   sndTime=msg_logTime[msg_source=="UDP"][1],#SerialSend为通过串口发送
                    rcvTime=msg_logTime[msg_source=="Serial"&!is.na(cmd)][1],
                    rcvCount=length(msg_logTime[msg_source=="Serial"]),
-                   sndCount=length(msg_logTime[msg_source=="SerialSend"])#,#UDP
+                   sndCount=length(msg_logTime[msg_source=="UDP"])#,#UDP
                    # Ts=mean(Ts,na.rm=TRUE),
                    # Tsr=mean(Tsr,na.rm=TRUE),
                    # Vs=mean(Vs,na.rm=TRUE),
@@ -64,15 +68,15 @@ data.iot.stat<-data.iot.raw[is.na(loop),#不考虑IoT自身状态回显的内容
                    ),by=msg_content]
 
 data.iot.stat[,delay:=rcvTime-sndTime]
-ggplot(data=data.iot.stat,aes(x=delay))+geom_density()
+ggplot(data=data.iot.stat[delay<1],aes(x=delay))+geom_density()+xlim(c(0,5))
 
 nrow(data.iot.stat[delay>1])/nrow(data.iot.stat[!is.na(rcvTime)])#active packet loss，即延迟大于1秒
 nrow(data.iot.stat[!is.na(rcvTime)])/nrow(data.iot.stat)#纯丢包
 
-mean(data.iot.stat[delay<0.005]$delay,na.rm=TRUE)
-sd(data.iot.stat[delay<0.005]$delay,na.rm=TRUE)
+mean(data.iot.stat[delay<1]$delay,na.rm=TRUE)
+sd(data.iot.stat[delay<1&delay>mean(data.iot.stat[delay<1]$delay,na.rm=TRUE)]$delay,na.rm=TRUE)
 
-write.xlsx(data.iot.stat,file="PacketAnalysis_SpeedTest.xlsx")
+write.xlsx(data.iot.stat,file="PacketAnalysis_SpeedTest_IoT_LTE_V2O_0502_MV=1_BV=0.25_Far.xlsx")
 
 #数据整理
 #串口回送的UDP数据，数据源为串口且cmd字段不为空
